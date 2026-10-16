@@ -7,6 +7,7 @@ import { addIcons } from 'ionicons';
 import { alertCircle, cloudOfflineOutline, informationCircleOutline, locationOutline, refresh, shieldCheckmark } from 'ionicons/icons';
 import { DonorService } from './donor.service';
 import { ContactRequestComponent } from '../contact/contact-request.modal';
+import { environment } from '../../../environments/environment';
 import { AuthService } from '../../core/auth.service';
 import { BLOOD_GROUPS, BloodGroup, PublicDonor } from '../../core/models';
 import { CityPickerComponent } from '../../shared/city-picker.component';
@@ -50,11 +51,18 @@ export class DonorSearchPage {
   pick(g: BloodGroup) { this.selected.set(this.selected() === g ? null : g); this.run(); }
   initials(name: string) { return name.trim().split(/\s+/).slice(0, 2).map(w => w[0]?.toUpperCase()).join(''); }
   async requestContact(d: PublicDonor) {
+    if (!environment.features.contact) return this.contactUnavailable();
     if (this.auth.current?.isAnonymous) return this.askToSignUp(d);
     const m = await this.modal.create({ component: ContactRequestComponent, componentProps: { donor: d, neededGroup: this.selected() }, initialBreakpoint: 1, breakpoints: [0, 1] });
     await m.present();
   }
   isMe(d: PublicDonor) { return d.uid === this.auth.current?.uid; }
+  /** Production on the free plan has no Cloud Functions yet; say so instead of failing. */
+  private async contactUnavailable() {
+    const a = await this.alert.create({ header: 'Contact requests are coming soon',
+      message: 'You can search donors now. Sending contact requests will be switched on shortly. In an emergency, contact the hospital blood bank directly.', buttons: ['OK'] });
+    await a.present();
+  }
   /** Contact needs a verified account (enforced in createContactRequest); explain why, then offer the way in. */
   private async askToSignUp(d: PublicDonor) {
     const a = await this.alert.create({

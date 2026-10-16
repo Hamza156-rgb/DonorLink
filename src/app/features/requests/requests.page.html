@@ -20,6 +20,7 @@
       </ion-segment>
     </section>
 
+    @if (!contactOn) { <p class="dl-info dl-offline gap" role="status"><ion-icon name="information-circle-outline" />Contact requests are coming soon. You can already search donors.</p> }
     @if (!net.online()) { <p class="dl-info dl-offline gap"><ion-icon name="information-circle-outline" />You’re offline. Showing your last saved requests.</p> }
     @if (loadError()) { <p class="dl-alert dl-offline gap" role="alert">Couldn’t load requests. Pull down or reopen this tab to try again.</p> }
 

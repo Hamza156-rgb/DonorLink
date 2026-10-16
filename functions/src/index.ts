@@ -3,6 +3,9 @@ import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { setGlobalOptions } from 'firebase-functions/v2';
+// Mumbai: closest region to Pakistan. Must match environment.functionsRegion in the app.
+setGlobalOptions({ region: 'asia-south1', maxInstances: 10 });
 initializeApp();
 const db = getFirestore();
 

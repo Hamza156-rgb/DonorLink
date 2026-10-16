@@ -12,6 +12,7 @@ import { ContactRequest, URGENCY_LABEL } from '../../core/models';
 import { NetworkService } from '../../core/network.service';
 import { ArtComponent } from '../../shared/art.component';
 import { PressDirective } from '../../shared/press.directive';
+import { environment } from '../../../environments/environment';
 
 type View = 'received' | 'sent';
 
@@ -29,7 +30,7 @@ export class RequestsPage {
   received = toSignal(this.orError(this.contacts.received$));
   sent = toSignal(this.orError(this.contacts.sent$));
   pending = computed(() => (this.received() ?? []).filter(r => r.status === 'pending').length);
-  busyId = signal('');
+  busyId = signal(''); contactOn = environment.features.contact;
   urgencyLabel = URGENCY_LABEL; ago = (r: ContactRequest) => timeAgo(r.createdAt?.toDate()); phone = displayPhone;
 
   constructor() {

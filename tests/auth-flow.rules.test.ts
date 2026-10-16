@@ -7,7 +7,7 @@ import { connectFunctionsEmulator, getFunctions, httpsCallable } from 'firebase/
 
 const PROJECT = 'demo-donorlink', AUTH = 'http://127.0.0.1:9099', FS = 'http://127.0.0.1:8080';
 const app = initializeApp({ projectId: PROJECT, apiKey: 'demo-api-key' }, 'auth-flow');
-const auth = getAuth(app), fs = getFirestore(app), fns = getFunctions(app);
+const auth = getAuth(app), fs = getFirestore(app), fns = getFunctions(app, 'asia-south1');
 const contact = httpsCallable(fns, 'createContactRequest');
 const respond = httpsCallable(fns, 'respondToContactRequest');
 const REQ = { bloodGroup: 'O+', urgency: 'today', hospital: 'Mayo Hospital, Lahore', message: 'Patient in ward 4' };
