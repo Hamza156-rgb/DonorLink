@@ -1,14 +1,14 @@
 import { EnvironmentInjector, Injectable, inject, runInInjectionContext } from '@angular/core';
 import { Firestore, collection, query, where, orderBy, limit, startAfter, getDocs, QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { PublicDonor, BloodGroup } from '../../core/models';
+import { PublicDonor, BloodGroup, isPaused } from '../../core/models';
 
 export interface DonorFilter { bloodGroup?: BloodGroup; city?: string; availableOnly: boolean; }
-export interface DonorPage { items: PublicDonor[]; cursor: QueryDocumentSnapshot | null; }
+export interface DonorPage { items: PublicDonor[]; cursor: QueryDocumentSnapshot | null; /** A full page came back, so there may be more. */ more: boolean; }
 
 @Injectable({ providedIn: 'root' })
 export class DonorService {
   private fs = inject(Firestore); private inj = inject(EnvironmentInjector);
-  /** Server-side query + cursor pagination; never filters the whole collection on the client. */
+  /** Server-side query + cursor pagination; never filters the whole collection on the client (only the pause date, per page). */
   async search(f: DonorFilter, cursor: QueryDocumentSnapshot | null = null, size = 15): Promise<DonorPage> {
     const c = [where('discoverable','==',true)];
     if (f.bloodGroup) c.push(where('bloodGroup','==',f.bloodGroup));
@@ -16,6 +16,10 @@ export class DonorService {
     if (f.availableOnly) c.push(where('availability','==','available'));
     const q = query(collection(this.fs,'publicDonorProfiles'), ...c, orderBy('updatedAt','desc'), ...(cursor ? [startAfter(cursor)] : []), limit(size));
     const snap = await runInInjectionContext(this.inj, () => getDocs(q));
-    return { items: snap.docs.map(d => ({ uid: d.id, ...(d.data() as Omit<PublicDonor,'uid'>) })), cursor: snap.docs.at(-1) ?? null };
+    let items = snap.docs.map(d => ({ uid: d.id, ...(d.data() as Omit<PublicDonor,'uid'>) }));
+    // Paused donors (e.g. resting after a donation) count as unavailable until their date passes. Firestore can't
+    // express "missing or in the past" in this query, so this one filter runs on the page that came back.
+    if (f.availableOnly) items = items.filter(d => !isPaused(d));
+    return { items, cursor: snap.docs.at(-1) ?? null, more: snap.size === size };
   }
 }

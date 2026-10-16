@@ -21,8 +21,8 @@ const search = (fs: ReturnType<typeof alice>, n?: number) => getDocs(n === undef
 
 beforeAll(async () => {
   env = await initializeTestEnvironment({
-    projectId: 'demo-donorlink',
-    firestore: { rules: readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8'), host: '127.0.0.1', port: 8080 },
+    projectId: process.env.RULES_TEST_PROJECT ?? 'demo-donorlink',   // override to test beside a running dev emulator without clearing its data
+    firestore: { rules: readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8'), host: '127.0.0.1', port: Number(process.env.FIRESTORE_EMULATOR_HOST?.split(':')[1] ?? 8080) },
   });
 });
 afterAll(() => env?.cleanup());
@@ -221,6 +221,15 @@ describe('contact workflow (rules only, works on the free plan)', () => {
     await assertSucceeds(send(V('sara'), 'sara', 'bob'));
   });
 
+  it('denied: donor is paused (e.g. resting after a donation) until a future date', async () => {
+    await env.withSecurityRulesDisabled(c => updateDoc(doc(c.firestore(), 'publicDonorProfiles/bob'), { pausedUntil: Timestamp.fromMillis(Date.now() + 86400_000) }));
+    await assertFails(send(V('sara'), 'sara', 'bob'));
+  });
+  it('donor is contactable again once the pause date has passed', async () => {
+    await env.withSecurityRulesDisabled(c => updateDoc(doc(c.firestore(), 'publicDonorProfiles/bob'), { pausedUntil: Timestamp.fromMillis(Date.now() - 86400_000) }));
+    await assertSucceeds(send(V('sara'), 'sara', 'bob'));
+  });
+
   describe('answering', () => {
     beforeEach(() => send(V('sara'), 'sara', 'bob'));
     const accept = (fs: ReturnType<typeof alice>, shared = { name: 'Bob Khan', phone: '+923000000001', preferredContact: 'whatsapp' }) =>
@@ -256,4 +265,65 @@ describe('contact workflow (rules only, works on the free plan)', () => {
     });
     it('nobody can delete a request', () => assertFails(deleteDoc(doc(V('sara'), 'contactRequests/sara_bob'))));
   });
+});
+
+describe('publicDonorProfiles: pausedUntil (neutral "back in search on" date)', () => {
+  const inDays = (n: number) => Timestamp.fromMillis(Date.now() + n * 86400_000);
+  it('donor can pause for about three months, and clear it early', async () => {
+    await assertSucceeds(setDoc(doc(verifiedBob(), 'publicDonorProfiles/bob'), donor({ pausedUntil: inDays(90) })));
+    await assertSucceeds(setDoc(doc(verifiedBob(), 'publicDonorProfiles/bob'), donor()));
+  });
+  it('denied: pause longer than a year, or not a date', async () => {
+    await assertFails(setDoc(doc(verifiedBob(), 'publicDonorProfiles/bob'), donor({ pausedUntil: inDays(400) })));
+    await assertFails(setDoc(doc(verifiedBob(), 'publicDonorProfiles/bob'), donor({ pausedUntil: '2027-01-01' })));
+  });
+  it('denied: donation details on the public listing', () =>
+    assertFails(setDoc(doc(verifiedBob(), 'publicDonorProfiles/bob'), donor({ pausedUntil: inDays(90), lastDonatedOn: inDays(0) }))));
+});
+
+describe('donationHistory: owner only', () => {
+  const V = (uid: string) => env.authenticatedContext(uid, { email: `${uid}@example.com`, email_verified: true, firebase: { sign_in_provider: 'password' } }).firestore();
+  const entry = (over: Record<string, unknown> = {}) => ({ donatedOn: Timestamp.now(), place: 'Mayo Hospital', createdAt: serverTimestamp(), ...over });
+  const days = (n: number) => Timestamp.fromMillis(Date.now() + n * 86400_000);
+  beforeEach(() => env.withSecurityRulesDisabled(async c => {
+    const base = { fromUid: 'sara', fromName: 'Sara Ali', toName: 'Bob K.', bloodGroup: 'O+', urgency: 'today', hospital: 'Mayo Hospital', city: 'Lahore', message: '', createdAt: Timestamp.now(), updatedAt: Timestamp.now() };
+    await setDoc(doc(c.firestore(), 'contactRequests/sara_bob'), { ...base, toUid: 'bob', status: 'accepted' });
+    await setDoc(doc(c.firestore(), 'contactRequests/sara_eve'), { ...base, toUid: 'eve', status: 'accepted' });
+    await setDoc(doc(c.firestore(), 'contactRequests/sam_bob'), { ...base, fromUid: 'sam', toUid: 'bob', status: 'pending' });
+  }));
+
+  it('donor can record a donation, with or without a linked request', async () => {
+    await assertSucceeds(setDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), entry()));
+    await assertSucceeds(setDoc(doc(V('bob'), 'donationHistory/bob/entries/e2'), entry({ requestId: 'sara_bob', donatedOn: days(-3) })));
+  });
+  it('owner can read, edit and delete their own entries', async () => {
+    await setDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), entry());
+    await assertSucceeds(getDocs(collection(V('bob'), 'donationHistory/bob/entries')));
+    await assertSucceeds(updateDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), { place: 'Jinnah Hospital' }));
+    await assertSucceeds(deleteDoc(doc(V('bob'), 'donationHistory/bob/entries/e1')));
+  });
+  it('denied: anyone else reads or writes it', async () => {
+    await setDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), entry());
+    await assertFails(getDocs(collection(V('sara'), 'donationHistory/bob/entries')));
+    await assertFails(getDoc(doc(V('sara'), 'donationHistory/bob/entries/e1')));
+    await assertFails(setDoc(doc(V('sara'), 'donationHistory/bob/entries/e9'), entry()));
+    await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'donationHistory/bob/entries/e1')));
+  });
+  it('denied: a future date, or one more than ten years ago', async () => {
+    await assertFails(setDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), entry({ donatedOn: days(5) })));
+    await assertFails(setDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), entry({ donatedOn: days(-4000) })));
+  });
+  it('denied: linking a request the donor did not accept, or someone else’s', async () => {
+    await assertFails(setDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), entry({ requestId: 'sam_bob' })));
+    await assertFails(setDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), entry({ requestId: 'sara_eve' })));
+  });
+  it('denied: extra fields, long place, client createdAt, or changing createdAt', async () => {
+    await assertFails(setDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), entry({ eligible: true })));
+    await assertFails(setDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), entry({ place: 'x'.repeat(121) })));
+    await assertFails(setDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), entry({ createdAt: Timestamp.fromMillis(0) })));
+    await setDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), entry());
+    await assertFails(updateDoc(doc(V('bob'), 'donationHistory/bob/entries/e1'), { createdAt: Timestamp.fromMillis(0) }));
+  });
+  it('denied: guest session', () =>
+    assertFails(setDoc(doc(env.authenticatedContext('g1', { firebase: { sign_in_provider: 'anonymous' } }).firestore(), 'donationHistory/g1/entries/e1'), entry())));
 });

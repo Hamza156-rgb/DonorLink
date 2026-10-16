@@ -1,15 +1,18 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { AlertController, IonButton, IonContent, IonIcon, IonRouterLink, IonSpinner, ToastController } from '@ionic/angular';
+import { AlertController, IonButton, IonContent, IonIcon, IonRouterLink, IonSpinner, ModalController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { call, checkmarkCircle, closeCircle, informationCircleOutline, locationOutline, logoWhatsapp, medkitOutline, timeOutline } from 'ionicons/icons';
+import { call, checkmarkCircle, closeCircle, heart, waterOutline, informationCircleOutline, locationOutline, logoWhatsapp, medkitOutline, timeOutline } from 'ionicons/icons';
 import { catchError, of } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
 import { authErrorMessage } from '../../core/auth-errors';
 import { ContactService, displayPhone, timeAgo, whatsappLink } from '../../core/contact.service';
 import { ContactRequest, URGENCY_LABEL } from '../../core/models';
 import { NetworkService } from '../../core/network.service';
+import { DonationService } from '../../core/donation.service';
+import { DonorProfileService } from '../../core/donor-profile.service';
+import { RecordDonationComponent } from '../donations/record-donation.modal';
 import { ArtComponent } from '../../shared/art.component';
 import { PressDirective } from '../../shared/press.directive';
 import { SegComponent, SegOption } from '../../shared/seg.component';
@@ -33,11 +36,16 @@ export class RequestsPage {
   sent = toSignal(this.orError(this.contacts.sent$));
   pending = computed(() => (this.received() ?? []).filter(r => r.status === 'pending').length);
   views = computed<SegOption[]>(() => [{ value: 'received', label: 'Received', badge: this.pending() }, { value: 'sent', label: 'Sent' }]);
+  /** Requests the donor already recorded a donation for, so the prompt disappears. */
+  donations = toSignal(inject(DonationService).entries$.pipe(catchError(() => of([]))));
+  recorded = computed(() => new Set((this.donations() ?? []).map(e => e.requestId).filter(Boolean)));
+  private listing = toSignal(inject(DonorProfileService).mine$);
+  private modal = inject(ModalController);
   busyId = signal(''); contactOn = environment.features.contact;
   urgencyLabel = URGENCY_LABEL; ago = (r: ContactRequest) => timeAgo(r.createdAt?.toDate()); phone = displayPhone;
 
   constructor() {
-    addIcons({ call, checkmarkCircle, closeCircle, informationCircleOutline, locationOutline, logoWhatsapp, medkitOutline, timeOutline });
+    addIcons({ call, checkmarkCircle, closeCircle, heart, waterOutline, informationCircleOutline, locationOutline, logoWhatsapp, medkitOutline, timeOutline });
     effect(() => { const v = this.view(); if (v === 'sent' || v === 'received') this.tab.set(v); });
   }
   setView(v: string) { this.tab.set(v as View); }
@@ -61,5 +69,10 @@ export class RequestsPage {
     } catch (e) {
       await (await this.toast.create({ message: authErrorMessage(e), duration: 3500, position: 'top', color: 'danger' })).present();
     } finally { this.busyId.set(''); }
+  }
+  async recordFor(r: ContactRequest) {
+    const m = await this.modal.create({ component: RecordDonationComponent, componentProps: { place: r.hospital, requestId: r.id, hasListing: !!this.listing() }, initialBreakpoint: 1, breakpoints: [0, 1] });
+    await m.present();
+    if ((await m.onDidDismiss()).data) (await this.toast.create({ message: 'Donation saved. Thank you.', duration: 2500, position: 'top' })).present();
   }
 }

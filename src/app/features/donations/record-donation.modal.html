@@ -1,0 +1,44 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Record a donation</ion-title>
+    <ion-buttons slot="end"><ion-button (click)="close()" aria-label="Close"><ion-icon slot="icon-only" name="close" /></ion-button></ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="thanks dl-card">
+    <span class="drop" aria-hidden="true"></span>
+    <div><strong>Thank you for donating</strong><small>Only you can see your donation history.</small></div>
+  </div>
+
+  @if (!net.online()) { <p class="dl-info"><ion-icon name="information-circle-outline" />You’re offline. Connect to save this donation.</p> }
+
+  <div class="dl-form">
+    <ion-input label="Date you donated" labelPlacement="stacked" fill="outline" type="date" [max]="today" [ngModel]="donatedOn()" (ngModelChange)="setDonatedOn($event)"
+      [class.ion-invalid]="touched() && !!dateError()" [class.ion-touched]="touched()" [errorText]="dateError()">
+      <ion-icon slot="start" name="calendar-outline" aria-hidden="true" />
+    </ion-input>
+    <ion-input label="Hospital or blood bank (optional)" labelPlacement="stacked" fill="outline" [(ngModel)]="place" maxlength="120" placeholder="e.g. Mayo Hospital, Lahore">
+      <ion-icon slot="start" name="medkit-outline" aria-hidden="true" />
+    </ion-input>
+
+    @if (hasListing) {
+      <div class="dl-card pause">
+        <ion-toggle [(ngModel)]="pause" labelPlacement="start" justify="space-between">
+          <strong>Pause my donor listing</strong><br /><small>People won’t see you under “Available now” or send requests until then.</small>
+        </ion-toggle>
+        @if (pause) {
+          <ion-input class="dl-field" label="Show me in search again on" labelPlacement="stacked" fill="outline" type="date" [min]="today" [max]="maxPause"
+            [ngModel]="pauseUntil()" (ngModelChange)="setPauseUntil($event)" />
+          <p class="auto">You’ll come back automatically on {{ pauseUntil() | date: 'd MMMM y' }}. You can change this any time.</p>
+        }
+      </div>
+    }
+
+    <p class="dl-info"><ion-icon name="information-circle-outline" />We suggest {{ restDays }} days, a gap many blood banks use for whole blood. Your blood bank decides when you can donate again, so use the date they gave you if it’s different.</p>
+    @if (error()) { <p class="dl-alert" role="alert"><ion-icon name="alert-circle" />{{ error() }}</p> }
+
+    <ion-button appPress class="dl-cta" expand="block" (click)="save()" [disabled]="busy() || !net.online()">
+      @if (busy()) { <ion-spinner name="crescent" aria-label="Saving" /> } @else { Save donation }
+    </ion-button>
+  </div>
+</ion-content>

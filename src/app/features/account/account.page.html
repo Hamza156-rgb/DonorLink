@@ -45,6 +45,12 @@
           <small>{{ d.city }} · {{ availabilityLabel[d.availability] }}</small></span>
         <span class="edit">Edit<ion-icon name="chevron-forward" aria-hidden="true" /></span>
       </a>
+      <a class="dl-card donor-card hist" appPress appTilt routerLink="/tabs/account/donations">
+        <span class="drop empty"><ion-icon name="calendar-outline" aria-hidden="true" /></span>
+        <span class="dtxt"><strong>Your donations</strong>
+          <small>@if (paused()) { Resting · back in search on {{ d.pausedUntil!.toDate() | date: 'd MMM' }} } @else { Record a donation and see your history }</small></span>
+        <ion-icon class="go" name="chevron-forward" aria-hidden="true" />
+      </a>
     } @else {
       <a class="dl-card donor-card become" appPress appTilt routerLink="/tabs/account/donor">
         <span class="drop empty"><ion-icon name="heart" aria-hidden="true" /></span>

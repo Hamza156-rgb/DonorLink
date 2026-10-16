@@ -4,7 +4,7 @@ import { deleteApp, initializeApp } from 'firebase/app';
 import { EmailAuthProvider, connectAuthEmulator, getAuth, getIdToken, linkWithCredential, reload, sendEmailVerification, sendPasswordResetEmail, signInAnonymously, signOut, updateProfile } from 'firebase/auth';
 import { collection, connectFirestoreEmulator, doc, getDoc, getDocs, updateDoc, writeBatch, getFirestore, limit, query, serverTimestamp, setDoc, setLogLevel, Timestamp, where } from 'firebase/firestore';
 
-const PROJECT = 'demo-donorlink', AUTH = 'http://127.0.0.1:9099', FS = 'http://127.0.0.1:8080';
+const PROJECT = process.env.RULES_TEST_PROJECT ?? 'demo-donorlink', AUTH = `http://${process.env.FIREBASE_AUTH_EMULATOR_HOST ?? '127.0.0.1:9099'}`, FS = `http://${process.env.FIRESTORE_EMULATOR_HOST ?? '127.0.0.1:8080'}`;
 const app = initializeApp({ projectId: PROJECT, apiKey: 'demo-api-key' }, 'auth-flow');
 const auth = getAuth(app), fs = getFirestore(app);
 // Mirrors ContactService (src/app/core/contact.service.ts): one batch = request + rate-limit counter.
@@ -32,7 +32,7 @@ const donorSearch = () => getDocs(query(collection(fs, 'publicDonorProfiles'), w
 
 beforeAll(async () => {
   connectAuthEmulator(auth, AUTH, { disableWarnings: true });
-  connectFirestoreEmulator(fs, '127.0.0.1', 8080);
+  connectFirestoreEmulator(fs, new URL(FS).hostname, Number(new URL(FS).port));
   await fetch(`${AUTH}/emulator/v1/projects/${PROJECT}/accounts`, { method: 'DELETE' });
   await fetch(`${FS}/emulator/v1/projects/${PROJECT}/databases/(default)/documents`, { method: 'DELETE' });
   // One listed donor, written with the emulator's owner token (bypasses rules).

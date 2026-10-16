@@ -1,4 +1,5 @@
 import { Component, effect, inject, input, signal, untracked } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { QueryDocumentSnapshot } from '@angular/fire/firestore';
@@ -9,14 +10,14 @@ import { DonorService } from './donor.service';
 import { ContactRequestComponent } from '../contact/contact-request.modal';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../core/auth.service';
-import { BLOOD_GROUPS, BloodGroup, PublicDonor } from '../../core/models';
+import { BLOOD_GROUPS, BloodGroup, PublicDonor, isPaused } from '../../core/models';
 import { CityPickerComponent } from '../../shared/city-picker.component';
 import { NetworkService } from '../../core/network.service';
 import { ArtComponent } from '../../shared/art.component';
 import { PressDirective } from '../../shared/press.directive';
 import { TiltDirective } from '../../shared/tilt.directive';
 
-@Component({ selector:'app-donor-search', imports:[IonContent,IonRefresher,IonRefresherContent,CityPickerComponent,IonToggle,IonButton,IonIcon,FormsModule,ArtComponent,PressDirective,TiltDirective], templateUrl:'./donor-search.page.html', styleUrls:['./donor-search.page.scss'] })
+@Component({ selector:'app-donor-search', imports:[IonContent,IonRefresher,IonRefresherContent,CityPickerComponent,IonToggle,IonButton,IonIcon,FormsModule,DatePipe,ArtComponent,PressDirective,TiltDirective], templateUrl:'./donor-search.page.html', styleUrls:['./donor-search.page.scss'] })
 export class DonorSearchPage {
   private svc = inject(DonorService); private modal = inject(ModalController); private alert = inject(AlertController);
   private auth = inject(AuthService); private router = inject(Router);
@@ -43,7 +44,7 @@ export class DonorSearchPage {
     this.loading.set(true); this.error.set('');
     try {
       const p = await this.svc.search({ bloodGroup: g, city: this.city || undefined, availableOnly: this.availableOnly }, this.cursor);
-      this.items.update(x => [...x, ...p.items]); this.cursor = p.cursor; this.more.set(p.items.length === 15); this.searched.set(true);
+      this.items.update(x => [...x, ...p.items]); this.cursor = p.cursor; this.more.set(p.more); this.searched.set(true);
     } catch (e) {
       console.warn('Donor search failed', e);   // keeps the real cause (e.g. index still building) visible in logs
       this.error.set('Could not load donors. Check your connection and try again.');
@@ -61,6 +62,7 @@ export class DonorSearchPage {
     await m.present();
   }
   isMe(d: PublicDonor) { return d.uid === this.auth.current?.uid; }
+  paused = (d: PublicDonor) => isPaused(d);
   /** Production on the free plan has no Cloud Functions yet; say so instead of failing. */
   private async contactUnavailable() {
     const a = await this.alert.create({ header: 'Contact requests are coming soon',

@@ -38,10 +38,11 @@
           <div class="info">
             <h3>{{d.displayName}} @if (d.verified) {<ion-icon class="ver" name="shield-checkmark" aria-label="Verified donor" />}</h3>
             <p><ion-icon name="location-outline" aria-hidden="true" />{{d.city}}, {{d.province}}</p>
-            <span class="dl-pill" [class.ok]="d.availability==='available'">{{d.availability==='available' ? 'Available' : 'Not available now'}}</span>
+            @if (paused(d)) { <span class="dl-pill">Back on {{ d.pausedUntil!.toDate() | date: 'd MMM' }}</span> }
+            @else { <span class="dl-pill" [class.ok]="d.availability==='available'">{{d.availability==='available' ? 'Available' : 'Not available now'}}</span> }
           </div>
           @if (isMe(d)) { <span class="dl-pill">You</span> }
-          @else { <ion-button appPress class="dl-cta contact" size="small" (click)="requestContact(d)">Contact</ion-button> }
+          @else if (!paused(d)) { <ion-button appPress class="dl-cta contact" size="small" (click)="requestContact(d)">Contact</ion-button> }
         </article>
       }
       @if (loading()) { @for (i of [1,2,3]; track i) { <div class="dl-card donor skel-card" aria-hidden="true"><div class="dl-skel sk-av"></div><div class="sk-lines"><div class="dl-skel"></div><div class="dl-skel"></div></div></div> } }

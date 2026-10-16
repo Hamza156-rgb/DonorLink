@@ -29,3 +29,5 @@ blockquote{margin:2px 0 0;padding:12px 14px;border-radius:var(--bd-r-sm);backgro
 .act.wa{background:var(--bd-card);color:var(--bd-navy);box-shadow:0 4px 0 var(--bd-line-strong),inset 0 1px 0 var(--bd-card)}
 .act.wa.is-pressed{transform:translateY(3px);box-shadow:0 1px 0 var(--bd-line-strong)}
 .sk{padding:16px;display:grid;gap:10px;box-shadow:none}.sk div{height:12px}.sk div:first-child{width:50%}.sk div:last-child{width:70%}
+.status.done{background:var(--bd-navy-soft);color:var(--bd-navy-deep)}
+.did{margin:2px 0 3px}

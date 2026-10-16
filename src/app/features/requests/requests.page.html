@@ -46,7 +46,13 @@
                   </ion-button>
                 </div>
               }
-              @case ('accepted') { <p class="status ok-navy"><ion-icon name="checkmark-circle" aria-hidden="true" />You shared your number. Expect a call or WhatsApp.</p> }
+              @case ('accepted') {
+                <p class="status ok-navy"><ion-icon name="checkmark-circle" aria-hidden="true" />You shared your number. Expect a call or WhatsApp.</p>
+                @if (recorded().has(r.id)) { <p class="status done"><ion-icon name="heart" aria-hidden="true" />Donation recorded. Thank you.</p> }
+                @else if (donations() !== undefined) {
+                  <ion-button appPress fill="outline" expand="block" class="did" (click)="recordFor(r)"><ion-icon slot="start" name="water-outline" />Did you donate? Record it</ion-button>
+                }
+              }
               @default { <p class="status"><ion-icon name="close-circle" aria-hidden="true" />You declined this request.</p> }
             }
           </article>

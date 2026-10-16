@@ -1,0 +1,82 @@
+<ion-content [fullscreen]="true">
+  <header class="dl-hero">
+    <div class="dl-hero-top"><button class="dl-icon-btn" type="button" (click)="back()" aria-label="Back"><ion-icon name="chevron-back" /></button></div>
+    <h1>Your donations</h1>
+    <p>Keep track of when you donated and when you’ll show in search again.</p>
+  </header>
+
+  <section class="dl-sheet status" aria-live="polite">
+    @if (listing() === undefined || entries() === undefined) {
+      <div class="dl-skel" style="height:110px"></div>
+    } @else if (paused()) {
+      <div class="rest">
+        <div class="ring" [style.--p]="progress()" role="img" [attr.aria-label]="daysLeft() + ' days until you show in search again'">
+          <span class="ring-in"><strong>{{ daysLeft() }}</strong><small>{{ daysLeft() === 1 ? 'day' : 'days' }}</small></span>
+        </div>
+        <div class="rest-txt">
+          <span class="eyebrow">Listing paused</span>
+          <h2>Back in search on {{ pausedUntil() | date: 'd MMMM' }}</h2>
+          <p class="dl-sub">You’ll come back automatically. Nothing to do.</p>
+        </div>
+      </div>
+      @if (editing()) {
+        <div class="edit-row">
+          <ion-input class="dl-field" label="New date" labelPlacement="stacked" fill="outline" type="date" [min]="today" [max]="maxPause" [(ngModel)]="newDate" />
+          <ion-button appPress class="dl-navy" (click)="saveDate()" [disabled]="busy()">Save date</ion-button>
+        </div>
+      } @else {
+        <div class="two">
+          <ion-button appPress fill="outline" (click)="startEdit()" [disabled]="busy()">Change date</ion-button>
+          <ion-button appPress fill="outline" (click)="showNow()" [disabled]="busy()">Show me now</ion-button>
+        </div>
+      }
+    } @else if (listing()) {
+      <div class="live"><span class="live-ic"><ion-icon name="checkmark-circle" aria-hidden="true" /></span>
+        <div><h2>You’re showing in donor search</h2><p class="dl-sub">After you donate, record it here to pause your listing while you rest.</p></div></div>
+    } @else {
+      <div class="live"><span class="live-ic off"><ion-icon name="information-circle-outline" aria-hidden="true" /></span>
+        <div><h2>You’re not listed as a donor</h2><p class="dl-sub">You can still keep a record of your donations here.</p></div></div>
+      <ion-button appPress fill="outline" expand="block" routerLink="/tabs/account/donor">Set up donor profile</ion-button>
+    }
+  </section>
+
+  @if (!net.online()) { <p class="dl-info dl-offline gap"><ion-icon name="cloud-offline-outline" />You’re offline. Showing your last saved donations.</p> }
+  @if (loadError()) { <p class="dl-alert dl-offline gap" role="alert"><ion-icon name="alert-circle" />Couldn’t load your donations. Reopen this screen to try again.</p> }
+
+  @if (entries()?.length) {
+    <section class="dl-section">
+      <div class="stats">
+        <div class="stat dl-card"><strong>{{ entries()!.length }}</strong><small>{{ entries()!.length === 1 ? 'Donation' : 'Donations' }}</small></div>
+        <div class="stat dl-card"><strong>{{ last()!.donatedOn.toDate() | date: 'd MMM' }}</strong><small>Last donated</small></div>
+      </div>
+    </section>
+  }
+
+  <section class="dl-section">
+    <ion-button appPress class="dl-cta" expand="block" (click)="add()" [disabled]="!net.online()"><ion-icon slot="start" name="add" />Record a donation</ion-button>
+  </section>
+
+  <section class="dl-section" aria-labelledby="hist-title">
+    <h2 class="dl-section-title" id="hist-title">History</h2>
+    @if (entries() === undefined) {
+      @for (i of [1,2]; track i) { <div class="dl-card entry sk"><div class="dl-skel"></div><div class="dl-skel"></div></div> }
+    } @else if (!entries()!.length) {
+      <div class="dl-state"><app-art kind="care" /><h3>No donations recorded yet</h3>
+        <p class="dl-sub">When you donate, record it here. If it came through DonorLink, use “Did you donate?” on the request.</p></div>
+    } @else {
+      <div class="list dl-stagger">
+        @for (e of entries(); track e.id) {
+          <article class="dl-card entry" appTilt>
+            <div class="date"><strong>{{ e.donatedOn.toDate() | date: 'd' }}</strong><small>{{ e.donatedOn.toDate() | date: 'MMM y' }}</small></div>
+            <div class="what"><strong>{{ e.place || 'Donation' }}</strong>
+              <small>@if (e.requestId) {<ion-icon name="checkmark-circle" aria-hidden="true" />Through a DonorLink request} @else { Added by you }</small></div>
+            <button class="del" appPress type="button" (click)="remove(e)" [attr.aria-label]="'Delete donation on ' + (e.donatedOn.toDate() | date: 'd MMMM y')"><ion-icon name="trash-outline" /></button>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <p class="dl-note"><ion-icon name="information-circle-outline" aria-hidden="true" />Only you can see your donation history. Your blood bank decides when you can donate again; DonorLink only pauses your listing.</p>
+  <div class="dl-page-end"></div>
+</ion-content>

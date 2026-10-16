@@ -21,7 +21,7 @@ service cloud.firestore {
     }
 
     function donorListingOk(d) {
-      return d.keys().hasOnly(['displayName','bloodGroup','province','city','availability','discoverable','verified','updatedAt'])
+      return d.keys().hasOnly(['displayName','bloodGroup','province','city','availability','discoverable','verified','updatedAt','pausedUntil'])
         && d.keys().hasAll(['displayName','bloodGroup','province','city','availability','discoverable','verified','updatedAt'])
         && d.displayName is string && d.displayName.size() >= 2 && d.displayName.size() <= 40
         && d.bloodGroup in ['A+','A-','B+','B-','AB+','AB-','O+','O-']
@@ -29,6 +29,8 @@ service cloud.firestore {
         && d.province in ['Punjab','Sindh','Khyber Pakhtunkhwa','Balochistan','Islamabad Capital Territory','Gilgit-Baltistan','Azad Kashmir']
         && d.availability in ['available','temporarily_unavailable','not_donating']
         && d.discoverable is bool
+        // Optional "back in search on" date (set after a donation, or any pause). Says nothing about why; max one year ahead.
+        && (!('pausedUntil' in d) || (d.pausedUntil is timestamp && d.pausedUntil <= request.time + duration.value(366, 'd')))
         && d.updatedAt == request.time;
     }
 
@@ -76,6 +78,7 @@ service cloud.firestore {
         && d.message is string && d.message.size() <= 300
         && d.createdAt == request.time && d.updatedAt == request.time
         && donor.discoverable == true && d.toName == donor.displayName && d.city == donor.city   // real, listed donor
+        && (!('pausedUntil' in donor) || donor.pausedUntil <= request.time)                     // not resting/paused
         && d.fromName == me.fullName                                                            // requester's real name
         && !exists(/databases/$(db)/documents/blockedUsers/$(d.toUid)/blocked/$(request.auth.uid))
         && getAfter(quota()).data.lastRequestId == id && getAfter(quota()).data.lastRequestAt == request.time;  // counted below
@@ -113,7 +116,24 @@ service cloud.firestore {
               && request.resource.data.count == resource.data.count + 1 && request.resource.data.count <= 5));
       allow delete: if false;
     }
-    match /donationHistory/{uid}/entries/{e} { allow read, write: if mine(uid); }
+    // ---------- Donation history: owner only. Never public; the listing only carries a neutral pausedUntil date.
+    function donationOk(uid) {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['donatedOn','place','requestId','createdAt'])
+        && d.keys().hasAll(['donatedOn','place','createdAt'])
+        && d.donatedOn is timestamp && d.donatedOn <= request.time + duration.value(1, 'd')       // not in the future
+        && d.donatedOn >= request.time - duration.value(3650, 'd')
+        && d.place is string && d.place.size() <= 120
+        // Linked request must be one this donor accepted.
+        && (!('requestId' in d) || (d.requestId is string
+          && get(/databases/$(db)/documents/contactRequests/$(d.requestId)).data.toUid == uid
+          && get(/databases/$(db)/documents/contactRequests/$(d.requestId)).data.status == 'accepted'));
+    }
+    match /donationHistory/{uid}/entries/{e} {
+      allow read, delete: if mine(uid);
+      allow create: if mine(uid) && donationOk(uid) && request.resource.data.createdAt == request.time;
+      allow update: if mine(uid) && donationOk(uid) && keep(['createdAt']);
+    }
     match /blockedUsers/{uid}/blocked/{b}    { allow read, write: if mine(uid); }
     match /userNotifications/{uid}/items/{n} { allow read: if me(uid); allow update: if me(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']); }
     match /deviceTokens/{uid}/tokens/{t}     { allow read, write: if mine(uid); }

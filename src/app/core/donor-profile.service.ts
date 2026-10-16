@@ -17,9 +17,9 @@ export class DonorProfileService {
       docData(doc(this.fs, 'publicDonorProfiles', u.uid)).pipe(map(d => d ? ({ uid: u.uid, ...d } as PublicDonor) : null)))),
     shareReplay({ bufferSize: 1, refCount: true }));
 
-  /** Creates or replaces the listing. "verified" is server-controlled, so the existing value is kept as-is. */
+  /** Creates or updates the listing. "verified" is server-controlled, so the existing value is kept as-is; merge keeps pausedUntil. */
   save(uid: string, l: DonorListing, verified: boolean): Promise<void> {
-    return runInInjectionContext(this.inj, () => setDoc(doc(this.fs, 'publicDonorProfiles', uid), { ...l, verified, updatedAt: serverTimestamp() }));
+    return runInInjectionContext(this.inj, () => setDoc(doc(this.fs, 'publicDonorProfiles', uid), { ...l, verified, updatedAt: serverTimestamp() }, { merge: true }));
   }
   remove(uid: string): Promise<void> {
     return runInInjectionContext(this.inj, () => deleteDoc(doc(this.fs, 'publicDonorProfiles', uid)));

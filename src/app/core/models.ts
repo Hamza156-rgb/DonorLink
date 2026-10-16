@@ -1,7 +1,13 @@
 export const BLOOD_GROUPS = ['A+','A-','B+','B-','AB+','AB-','O+','O-'] as const;
 export type BloodGroup = typeof BLOOD_GROUPS[number];
 export type Availability = 'available' | 'temporarily_unavailable' | 'not_donating';
-export interface PublicDonor { uid: string; displayName: string; bloodGroup: BloodGroup; province: string; city: string; availability: Availability; verified: boolean; discoverable?: boolean; }
+/** Firestore Timestamp, kept structural so models stay SDK-free. */
+export interface TimestampLike { toDate(): Date; toMillis(): number }
+export interface PublicDonor { uid: string; displayName: string; bloodGroup: BloodGroup; province: string; city: string; availability: Availability; verified: boolean; discoverable?: boolean;
+  /** Neutral "back in search on" date (e.g. resting after a donation). Search and rules treat the donor as unavailable until then. */
+  pausedUntil?: TimestampLike; }
+/** True while the donor's pause date is still ahead. */
+export const isPaused = (d: Pick<PublicDonor, 'pausedUntil'> | null | undefined, now = Date.now()) => !!d?.pausedUntil && d.pausedUntil.toMillis() > now;
 export { PK_CITIES, CITY_PROVINCE, POPULAR_CITIES } from './pk-cities';
 
 export const PREFERRED_CONTACT = ['in_app','phone','whatsapp'] as const;
@@ -25,3 +31,11 @@ export interface ContactRequest {
 export const AVAILABILITY = ['available','temporarily_unavailable','not_donating'] as const;
 export const AVAILABILITY_LABEL: Record<Availability,string> = { available:'Available', temporarily_unavailable:'Not right now', not_donating:'Not donating' };
 export const PROVINCES = ['Punjab','Sindh','Khyber Pakhtunkhwa','Balochistan','Islamabad Capital Territory','Gilgit-Baltistan','Azad Kashmir'] as const;
+
+/** donationHistory/{uid}/entries/{id}: owner-only record. Never shown to anyone else. */
+export interface DonationEntry { id: string; donatedOn: TimestampLike; place: string; requestId?: string; createdAt?: TimestampLike }
+/**
+ * Default gap before the listing returns to search. A gap of about three months is commonly used for whole blood;
+ * the donor can change it, and the app always says the blood bank decides. Not a medical eligibility rule.
+ */
+export const DEFAULT_REST_DAYS = 90;

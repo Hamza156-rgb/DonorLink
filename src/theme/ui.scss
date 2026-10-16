@@ -151,7 +151,9 @@ ion-button.dl-link{--color:var(--bd-navy);font-weight:800}
 .dl-blood{display:inline-grid;place-items:center;min-width:44px;height:30px;padding:0 10px;border-radius:99px;background:var(--bd-red-soft);color:var(--bd-red);font-weight:800;font-size:.88rem;box-shadow:inset 0 0 0 1px rgba(var(--bd-red-rgb),.15)}
 
 // ---------- Forms
-.dl-form{display:grid;gap:16px}
+.dl-form{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+// Native date inputs have a wide intrinsic width; let them shrink to the column.
+ion-input input[type=date]{min-width:0;width:100%}
 .dl-form ion-input,.dl-form ion-select,.dl-form ion-textarea,ion-input.dl-field{
   --border-radius:var(--bd-r-sm);--border-color:var(--bd-line-strong);--highlight-color-focused:var(--bd-navy);--highlight-color-valid:var(--bd-navy);--background:var(--bd-card);
   min-height:var(--bd-tap);
@@ -232,3 +234,6 @@ ion-modal ion-title{font-weight:800;letter-spacing:-.02em}
 .dl-guest strong{display:block;font-size:1rem;font-weight:800}.dl-guest small{color:var(--bd-muted);font-size:.85rem}
 .dl-guest > span:nth-child(2){flex:1}
 .dl-guest-ic{display:grid;place-items:center;flex:none;width:48px;height:48px;border-radius:16px;background:var(--bd-cta);color:var(--bd-on-brand);font-size:1.35rem;box-shadow:0 3px 0 var(--bd-red-deep),var(--bd-shadow-red)}
+
+// Toggle labels with a second line (title + explanation) wrap instead of truncating.
+ion-toggle::part(label){white-space:normal;overflow:visible}
