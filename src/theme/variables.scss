@@ -1,7 +1,7 @@
 // DonorLink design tokens. Brand colours are sampled from the logo (navy figure, red drop).
 // Rules: red = action/urgency only, green = "available" only, navy = brand surfaces.
 :root{
- --ion-font-family:"Plus Jakarta Sans Variable","Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+ --ion-font-family:"Inter Variable","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 
  --bd-navy:#0B417F; --bd-navy-deep:#06264D; --bd-navy-ink:#041A36; --bd-navy-mid:#1B5AA6; --bd-navy-mid-rgb:27,90,166; --bd-navy-soft:#E8EFF8; --bd-navy-rgb:11,65,127;
  --bd-red:#C8101B; --bd-red-bright:#EA2129; --bd-red-glow:#FF5A5F; --bd-red-deep:#99070F; --bd-red-soft:#FDECED; --bd-red-rgb:200,16,27;
@@ -35,7 +35,10 @@
  --ion-color-secondary-contrast-rgb:255,255,255; --ion-color-secondary-shade:#0A3970; --ion-color-secondary-tint:#23548C;
  --ion-background-color:var(--bd-paper); --ion-text-color:var(--bd-ink);
 }
-h1,h2,h3{letter-spacing:-.025em;line-height:1.2}
-ion-button{--border-radius:var(--bd-r-sm);min-height:var(--bd-tap);font-weight:700;text-transform:none;letter-spacing:0}
+// Type scale: 15px root (all text sizes are rem) suits 360px-wide phones; touch targets stay in px.
+html{font-size:15px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+body{font-feature-settings:"cv11","ss03"}
+h1,h2,h3{letter-spacing:-.02em;line-height:1.25;font-weight:700}
+ion-button{--border-radius:var(--bd-r-sm);min-height:var(--bd-tap);font-weight:600;text-transform:none;letter-spacing:0}
 :focus-visible{outline:3px solid var(--bd-focus);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

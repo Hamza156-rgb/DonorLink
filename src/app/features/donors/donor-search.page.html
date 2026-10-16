@@ -17,7 +17,7 @@
     <span class="step-lbl gap">Step 2 · Narrow it down</span>
     <div class="filters">
       <app-city-picker [(value)]="city" (picked)="run()" />
-      <ion-toggle [(ngModel)]="availableOnly" (ionChange)="run()" labelPlacement="start">Available now</ion-toggle>
+      <ion-toggle [(ngModel)]="availableOnly" (ionChange)="run()" labelPlacement="start" justify="space-between">Available now</ion-toggle>
     </div>
   </section>
 

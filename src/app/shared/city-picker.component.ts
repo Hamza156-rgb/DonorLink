@@ -23,8 +23,8 @@ import { PressDirective } from './press.directive';
       font:700 .9rem var(--ion-font-family);box-shadow:0 2px 0 var(--bd-line)}
     .chip.on{background:var(--bd-navy-btn);border-color:var(--bd-navy-deep);color:var(--bd-on-brand);box-shadow:0 2px 0 var(--bd-navy-ink)}
     .hint{margin:4px 16px 8px;color:var(--bd-muted);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-    ion-item-divider{--background:var(--bd-paper);--color:var(--bd-muted);font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;min-height:36px}
-    ion-item{--min-height:52px} ion-item.on{--color:var(--bd-navy);font-weight:800}
+    ion-item-divider{--background:var(--bd-paper);--color:var(--bd-muted);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;min-height:36px}
+    ion-item{--min-height:52px} ion-item.on{--color:var(--bd-navy);font-weight:700}
     .empty{padding:32px 24px;text-align:center;color:var(--bd-muted);line-height:1.5}
     ion-searchbar{--border-radius:var(--bd-r-sm);--background:var(--bd-paper);padding-top:4px}
   `],

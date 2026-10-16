@@ -23,18 +23,18 @@ ion-content{--background:var(--bd-page)}
   }
   > *{position:relative;z-index:1;animation:dl-rise .55s var(--bd-ease) backwards}
   > :nth-child(2){animation-delay:.05s} > :nth-child(3){animation-delay:.1s} > :nth-child(n+4){animation-delay:.15s}
-  h1{margin:0;font-size:1.75rem;font-weight:800;text-shadow:0 2px 12px rgba(var(--bd-ink-rgb),.35)}
-  p{margin:6px 0 0;opacity:.84;line-height:1.5;max-width:30ch}
+  h1{margin:0;font-size:1.5rem;font-weight:700;text-shadow:0 2px 12px rgba(var(--bd-ink-rgb),.35)}
+  p{margin:6px 0 0;opacity:.84;line-height:1.5;max-width:32ch;font-size:.95rem}
 }
 @keyframes dl-drop{0%,100%{transform:rotate(-45deg) translate(0,0)}50%{transform:rotate(-38deg) translate(-4px,-10px)}}
 @keyframes dl-bob{50%{transform:translateY(-10px) scale(1.04)}}
 .dl-hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:40px;margin-bottom:18px}
-.dl-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;letter-spacing:-.01em}
+.dl-brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem;letter-spacing:-.01em}
 .dl-icon-btn{
   display:grid;place-items:center;width:var(--bd-tap);height:var(--bd-tap);margin:-4px;border:1px solid var(--bd-glass-line);border-radius:16px;
   background:var(--bd-glass);color:var(--bd-on-brand);font-size:1.35rem;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
 }
-.dl-eyebrow{display:inline-flex;align-items:center;gap:6px;margin:0 0 6px;padding:5px 10px;border-radius:99px;background:var(--bd-glass);border:1px solid var(--bd-glass-line);font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.dl-eyebrow{display:inline-flex;align-items:center;gap:6px;margin:0 0 6px;padding:5px 10px;border-radius:99px;background:var(--bd-glass);border:1px solid var(--bd-glass-line);font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 
 // ---------- Logo badge: the mark on a raised white disc (its navy figure needs a light ground)
 .dl-logo-badge{
@@ -52,12 +52,12 @@ ion-content{--background:var(--bd-page)}
 .dl-card{position:relative;background:var(--bd-card);border:1px solid rgba(var(--bd-navy-rgb),.07);border-radius:var(--bd-r-md);box-shadow:var(--bd-shadow-1),var(--bd-rim)}
 .dl-section{padding:26px 16px 0;animation:dl-rise .5s .14s var(--bd-ease) backwards}
 .dl-section + .dl-section{animation-delay:.2s}
-.dl-section-title{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:1.08rem;font-weight:800}
+.dl-section-title{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:1rem;font-weight:700}
 .dl-section-title::before{content:"";width:4px;height:18px;border-radius:4px;background:var(--bd-navy-btn)}
 .dl-sub{margin:0;color:var(--bd-muted);font-size:.9rem;line-height:1.5}
 .dl-page-end{height:calc(var(--ion-safe-area-bottom,0px) + 28px)}
 // Tab screens scroll under the floating tab bar, so their last item needs to clear it.
-ion-tabs .dl-page-end{height:calc(var(--ion-safe-area-bottom,0px) + 104px)}
+ion-tabs .dl-page-end{height:calc(var(--ion-safe-area-bottom,0px) + 84px)}
 
 // Lists: children rise in one after another.
 .dl-stagger > *{animation:dl-rise .45s var(--bd-ease) backwards}
@@ -87,29 +87,29 @@ ion-tabs .dl-page-end{height:calc(var(--ion-safe-area-bottom,0px) + 104px)}
 ion-button.dl-cta{
   --background:var(--bd-cta);--background-activated:var(--bd-red);--background-focused:var(--bd-red);--border-radius:16px;
   --box-shadow:0 4px 0 var(--bd-red-deep),var(--bd-shadow-red),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.4);
-  min-height:54px;font-size:1rem;font-weight:800;margin-bottom:4px;
+  min-height:50px;font-size:.95rem;font-weight:600;margin-bottom:4px;
   &.is-pressed,&:active{transform:translateY(3px);--box-shadow:0 1px 0 var(--bd-red-deep),0 6px 12px -8px rgba(var(--bd-red-rgb),.7),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.3)}
   &[disabled]{--box-shadow:none;opacity:.55}
 }
 ion-button.dl-navy{
   --background:var(--bd-navy-btn);--background-activated:var(--bd-navy-deep);--color:var(--bd-on-brand);--border-radius:16px;
-  --box-shadow:0 4px 0 var(--bd-navy-ink),var(--bd-shadow-2),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.3);min-height:52px;font-weight:800;margin-bottom:4px;
+  --box-shadow:0 4px 0 var(--bd-navy-ink),var(--bd-shadow-2),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.3);min-height:52px;font-weight:700;margin-bottom:4px;
   &.is-pressed,&:active{transform:translateY(3px);--box-shadow:0 1px 0 var(--bd-navy-ink),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.25)}
 }
 ion-button[fill=outline]:not(.signout){
   --background:var(--bd-card);--border-width:1px;--border-color:var(--bd-line-strong);--border-radius:16px;--color:var(--bd-navy);
-  --box-shadow:0 3px 0 var(--bd-line-strong),var(--bd-shadow-1);font-weight:800;margin-bottom:3px;
+  --box-shadow:0 3px 0 var(--bd-line-strong),var(--bd-shadow-1);font-weight:700;margin-bottom:3px;
   &.is-pressed,&:active{transform:translateY(2px);--box-shadow:0 1px 0 var(--bd-line-strong)}
 }
 ion-button.dl-ghost{--color:var(--bd-on-brand);--border-color:rgba(var(--bd-on-brand-rgb),.55);--background-activated:rgba(var(--bd-on-brand-rgb),.12)}
-ion-button.dl-link{--color:var(--bd-navy);font-weight:800}
+ion-button.dl-link{--color:var(--bd-navy);font-weight:700}
 
 // ---------- Blood group keycaps: 3D keys with a visible edge that sink when pressed
 .dl-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .dl-key{
-  position:relative;min-height:60px;padding:0;border:1px solid var(--bd-line);border-radius:18px;
+  position:relative;min-height:54px;padding:0;border:1px solid var(--bd-line);border-radius:16px;
   background:linear-gradient(180deg,var(--bd-card) 0%,var(--bd-card) 45%,var(--bd-paper) 100%);color:var(--bd-ink);
-  font:800 1.15rem var(--ion-font-family);letter-spacing:-.01em;
+  font:700 1.02rem var(--ion-font-family);letter-spacing:-.01em;
   box-shadow:0 5px 0 var(--bd-line-strong),0 12px 18px -10px rgba(var(--bd-navy-rgb),.35),inset 0 1px 0 var(--bd-card);
   transition:transform .12s ease,box-shadow .12s ease,background .2s ease,color .2s ease;-webkit-tap-highlight-color:transparent;
   &::before{content:"";position:absolute;inset:3px 6px auto;height:40%;border-radius:14px 14px 30px 30px;background:var(--bd-sheen);pointer-events:none;opacity:.7}
@@ -127,7 +127,7 @@ ion-button.dl-link{--color:var(--bd-navy);font-weight:800}
     position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:0 6px;border:0;border-radius:14px;
     background:transparent;color:var(--bd-muted);font:700 .9rem var(--ion-font-family);line-height:1.2;transition:color .25s ease;-webkit-tap-highlight-color:transparent;
   }
-  button.on{color:var(--bd-on-brand);font-weight:800}
+  button.on{color:var(--bd-on-brand);font-weight:700}
   button:disabled{opacity:.5}
 }
 .dl-seg-pill{
@@ -136,19 +136,19 @@ ion-button.dl-link{--color:var(--bd-navy);font-weight:800}
   transform:translateX(calc(100% * var(--i,0)));transition:transform .4s var(--bd-spring),opacity .2s ease;
 }
 .dl-seg.off .dl-seg-pill{opacity:0}
-.dl-seg-badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--bd-cta);color:var(--bd-on-brand);font-size:.72rem;font-weight:800;box-shadow:0 2px 6px -1px rgba(var(--bd-red-rgb),.6)}
+.dl-seg-badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--bd-cta);color:var(--bd-on-brand);font-size:.72rem;font-weight:700;box-shadow:0 2px 6px -1px rgba(var(--bd-red-rgb),.6)}
 
 // ---------- Avatars: soft 3D tiles with initials
 .dl-av{
   position:relative;display:grid;place-items:center;flex:none;width:54px;height:54px;border-radius:18px;
-  background:linear-gradient(160deg,var(--bd-card) 0%,var(--bd-navy-soft) 100%);color:var(--bd-navy);font-weight:800;font-size:1.05rem;
+  background:linear-gradient(160deg,var(--bd-card) 0%,var(--bd-navy-soft) 100%);color:var(--bd-navy);font-weight:700;font-size:1.05rem;
   box-shadow:inset 0 -3px 0 rgba(var(--bd-navy-rgb),.14),inset 0 1px 0 var(--bd-card),0 6px 14px -8px rgba(var(--bd-navy-rgb),.5);border:1px solid rgba(var(--bd-navy-rgb),.08);
 }
 .dl-bg{
   position:absolute;right:-9px;bottom:-9px;min-width:32px;padding:3px 7px;border-radius:99px;background:var(--bd-cta);color:var(--bd-on-brand);
-  border:2px solid var(--bd-card);font-size:.72rem;font-weight:800;text-align:center;box-shadow:0 4px 10px -3px rgba(var(--bd-red-rgb),.7)
+  border:2px solid var(--bd-card);font-size:.72rem;font-weight:700;text-align:center;box-shadow:0 4px 10px -3px rgba(var(--bd-red-rgb),.7)
 }
-.dl-blood{display:inline-grid;place-items:center;min-width:44px;height:30px;padding:0 10px;border-radius:99px;background:var(--bd-red-soft);color:var(--bd-red);font-weight:800;font-size:.88rem;box-shadow:inset 0 0 0 1px rgba(var(--bd-red-rgb),.15)}
+.dl-blood{display:inline-grid;place-items:center;min-width:44px;height:30px;padding:0 10px;border-radius:99px;background:var(--bd-red-soft);color:var(--bd-red);font-weight:700;font-size:.88rem;box-shadow:inset 0 0 0 1px rgba(var(--bd-red-rgb),.15)}
 
 // ---------- Forms
 .dl-form{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
@@ -180,7 +180,7 @@ ion-input input[type=date]{min-width:0;width:100%}
 
 // ---------- Empty/first-use state
 .dl-state{display:grid;justify-items:center;gap:6px;text-align:center;padding:16px 24px 8px}
-.dl-state h3{margin:8px 0 0;font-size:1.08rem;font-weight:800}
+.dl-state h3{margin:8px 0 0;font-size:1.08rem;font-weight:700}
 .dl-state app-art{width:140px}
 .dl-state ion-button{margin-top:10px}
 
@@ -192,18 +192,18 @@ ion-input input[type=date]{min-width:0;width:100%}
 .dl-float{animation:dl-float 4.5s ease-in-out infinite}
 @keyframes dl-float{50%{transform:translateY(-8px)}}
 
-// ---------- Tabs: floating rounded bar; the selected icon sits in a soft pill
-ion-tabs{background:var(--bd-paper)}
+// ---------- Tabs: docked bar with rounded top; solid down to the screen edge (Ionic pads the system nav area)
+ion-tabs{background:var(--bd-card)}
 ion-tab-bar{
   --background:var(--bd-card);--color:var(--bd-muted);--color-selected:var(--bd-navy);--border:0;
-  height:68px;margin:0 12px calc(var(--ion-safe-area-bottom,0px) + 10px);padding:0 6px;border-radius:26px;
-  box-shadow:0 18px 40px -14px rgba(var(--bd-navy-rgb),.45),0 0 0 1px rgba(var(--bd-navy-rgb),.06);overflow:hidden;
+  height:66px;border-radius:22px 22px 0 0;
+  box-shadow:0 -10px 30px -12px rgba(var(--bd-navy-rgb),.28),0 -1px 0 rgba(var(--bd-navy-rgb),.06);
 }
-ion-tab-button{--background:transparent;font-weight:700;--padding-top:8px;--padding-bottom:6px;--ripple-color:var(--bd-navy)}
-ion-tab-button ion-label{font-size:.72rem;margin-top:4px}
-ion-tab-button ion-icon{padding:4px 16px;border-radius:99px;transition:background .25s ease,transform .3s var(--bd-spring)}
+ion-tab-button{--background:transparent;font-weight:500;--padding-top:6px;--padding-bottom:6px;--ripple-color:var(--bd-navy)}
+ion-tab-button ion-label{font-size:.7rem;margin-top:3px}
+ion-tab-button ion-icon{padding:3px 16px;font-size:22px;border-radius:99px;transition:background .25s ease,transform .3s var(--bd-spring)}
 ion-tab-button.tab-selected ion-icon{background:var(--bd-navy-soft);transform:translateY(-1px)}
-ion-tab-button.tab-selected ion-label{font-weight:800}
+ion-tab-button.tab-selected ion-label{font-weight:600}
 
 // ---------- Status bar scrim: keeps scrolled content from showing under the status icons
 .dl-statusbar{position:fixed;inset:0 0 auto;height:var(--ion-safe-area-top,0px);background:var(--bd-navy-deep);z-index:1000;pointer-events:none}
@@ -216,7 +216,7 @@ ion-tab-button.tab-selected ion-label{font-weight:800}
 // ---------- Modals: rounded sheet top
 ion-modal{--border-radius:28px 28px 0 0}
 ion-modal ion-toolbar{--background:var(--bd-card);--border-width:0;padding-top:6px}
-ion-modal ion-title{font-weight:800;letter-spacing:-.02em}
+ion-modal ion-title{font-weight:700;letter-spacing:-.02em}
 
 // ---------- Small layout helpers shared by auth screens
 .dl-row-end{display:flex;justify-content:flex-end;margin:-8px 0 -6px}
@@ -224,14 +224,14 @@ ion-modal ion-title{font-weight:800;letter-spacing:-.02em}
 .dl-art-sm{width:132px;margin:0 auto 8px}
 .dl-steps{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:10px;counter-reset:s}
 .dl-steps li{display:flex;gap:12px;align-items:center;line-height:1.4;counter-increment:s}
-.dl-steps li::before{content:counter(s);flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:var(--bd-navy-btn);color:var(--bd-on-brand);font-weight:800;font-size:.85rem;box-shadow:0 3px 0 var(--bd-navy-ink)}
+.dl-steps li::before{content:counter(s);flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:var(--bd-navy-btn);color:var(--bd-on-brand);font-weight:700;font-size:.85rem;box-shadow:0 3px 0 var(--bd-navy-ink)}
 
 // ---------- "or" divider + guest entry card (login)
 .dl-or{display:flex;align-items:center;gap:12px;margin:22px 32px 14px;color:var(--bd-muted);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
 .dl-or::before,.dl-or::after{content:"";flex:1;height:1px;background:var(--bd-line-strong)}
 .dl-guest{display:flex;align-items:center;gap:14px;width:calc(100% - 32px);margin:0 16px;padding:16px;text-align:left;font-family:var(--ion-font-family);color:var(--bd-ink);box-shadow:0 5px 0 var(--bd-line-strong),var(--bd-shadow-1)}
 .dl-guest:active,.dl-guest.is-pressed{box-shadow:0 1px 0 var(--bd-line-strong)}
-.dl-guest strong{display:block;font-size:1rem;font-weight:800}.dl-guest small{color:var(--bd-muted);font-size:.85rem}
+.dl-guest strong{display:block;font-size:1rem;font-weight:700}.dl-guest small{color:var(--bd-muted);font-size:.85rem}
 .dl-guest > span:nth-child(2){flex:1}
 .dl-guest-ic{display:grid;place-items:center;flex:none;width:48px;height:48px;border-radius:16px;background:var(--bd-cta);color:var(--bd-on-brand);font-size:1.35rem;box-shadow:0 3px 0 var(--bd-red-deep),var(--bd-shadow-red)}
 

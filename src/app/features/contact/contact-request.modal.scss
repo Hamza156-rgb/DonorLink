@@ -1,9 +1,9 @@
 .who{display:flex;align-items:center;gap:16px;padding:16px;margin-bottom:18px;background:radial-gradient(80% 120% at 100% 0%,var(--bd-navy-soft),transparent 70%),var(--bd-card)}
-.who strong{display:block;font-size:1.08rem;font-weight:800}
+.who strong{display:block;font-size:1.08rem;font-weight:700}
 .who small{display:flex;align-items:center;gap:4px;color:var(--bd-muted)}
 .dl-av{width:52px;height:52px;font-size:1.15rem}
 .lbl{margin:0 0 8px;font-size:.85rem;font-weight:700;color:var(--bd-muted)}
 .done{display:grid;gap:14px;text-align:center;padding-top:8px}
-.done h2{margin:0;font-size:1.3rem;font-weight:800}
+.done h2{margin:0;font-size:1.3rem;font-weight:700}
 .done .dl-info{text-align:left}
-.for{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:99px;background:var(--bd-red-soft);color:var(--bd-red);font-size:.78rem;font-weight:800}
+.for{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:99px;background:var(--bd-red-soft);color:var(--bd-red);font-size:.78rem;font-weight:700}
