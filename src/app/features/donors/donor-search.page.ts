@@ -43,7 +43,10 @@ export class DonorSearchPage {
     try {
       const p = await this.svc.search({ bloodGroup: g, city: this.city || undefined, availableOnly: this.availableOnly }, this.cursor);
       this.items.update(x => [...x, ...p.items]); this.cursor = p.cursor; this.more.set(p.items.length === 15); this.searched.set(true);
-    } catch { this.error.set('Could not load donors. Check your connection and try again.'); }
+    } catch (e) {
+      console.warn('Donor search failed', e);   // keeps the real cause (e.g. index still building) visible in logs
+      this.error.set('Could not load donors. Check your connection and try again.');
+    }
     finally { this.loading.set(false); }
   }
   async refresh(e: Event) { await this.run(); (e as RefresherCustomEvent).target.complete(); }

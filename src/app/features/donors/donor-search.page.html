@@ -44,7 +44,7 @@
       }
       @if (loading()) { @for (i of [1,2,3]; track i) { <div class="dl-card donor skel-card" aria-hidden="true"><div class="dl-skel sk-av"></div><div class="sk-lines"><div class="dl-skel"></div><div class="dl-skel"></div></div></div> } }
     @if (searched() && !loading() && !items().length && !error()) {
-      <div class="state"><app-art class="state-art" kind="empty" /><h3>No {{selected() ?? ''}} donors {{ city ? 'in ' + city : 'listed' }} yet</h3>
+      <div class="state"><app-art class="state-art" kind="empty" /><h3>No {{ selected() ? selected() + ' ' : '' }}donors {{ city ? 'in ' + city : 'listed' }} yet</h3>
         <p class="dl-sub">Try all cities, another blood group, or turn off “Available now”. More donors join every day.</p></div>
     }
     @if (more() && !loading()) { <ion-button appPress expand="block" fill="outline" color="secondary" class="more" (click)="run(false)">Load more donors</ion-button> }

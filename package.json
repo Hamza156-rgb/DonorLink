@@ -12,9 +12,11 @@
     "lint": "ng lint",
     "test:rules": "npm --prefix tests test",
     "emulators": "firebase emulators:start --project demo-donorlink",
-    "test:rules:ci": "npm --prefix functions run build && firebase emulators:exec --only auth,firestore,functions --project demo-donorlink \"npm run test:rules\"",
+    "test:rules:ci": "firebase emulators:exec --only auth,firestore --project demo-donorlink \"npm run test:rules\"",
     "seed": "node scripts/seed-emulator.mjs",
-    "dev": "firebase emulators:exec --project demo-donorlink --ui \"node scripts/seed-emulator.mjs && ionic serve\""
+    "dev": "firebase emulators:exec --project demo-donorlink --ui \"node scripts/seed-emulator.mjs && ionic serve\"",
+    "serve:prod": "ng serve --configuration production",
+    "deploy:firestore": "firebase deploy --only firestore --project default"
   },
   "private": true,
   "dependencies": {

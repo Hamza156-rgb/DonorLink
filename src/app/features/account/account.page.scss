@@ -14,5 +14,10 @@ dd{margin:0 0 0 auto;max-width:100%;font-weight:700;text-align:right;overflow-wr
 .perks{margin:0;padding:0;list-style:none;display:grid;gap:8px;text-align:left}
 .perks li{display:flex;gap:10px;align-items:center;font-weight:600}.perks ion-icon{color:var(--bd-navy);font-size:1.2rem;flex:none}
 .avatar ion-icon{font-size:2.2rem}
+.donor-card{display:flex;align-items:center;gap:14px;padding:14px 16px;color:var(--bd-ink);text-decoration:none}
+.drop{display:grid;place-items:center;flex:none;width:52px;height:52px;border-radius:16px;background:var(--bd-cta);color:var(--bd-on-brand);font-weight:800;box-shadow:var(--bd-shadow-red),inset 0 -3px 0 rgba(0,0,0,.15)}
+.drop.empty{background:var(--bd-navy-soft);color:var(--bd-navy);box-shadow:inset 0 -3px 0 rgba(var(--bd-navy-rgb),.12);font-size:1.4rem}
+.dtxt{flex:1;min-width:0;display:grid;gap:2px}.dtxt strong{font-weight:800}.dtxt small{color:var(--bd-muted);font-size:.85rem;line-height:1.35}
+.edit{display:flex;align-items:center;gap:2px;color:var(--bd-navy);font-weight:800;font-size:.9rem}.go{color:var(--bd-muted)}
 .foot{display:grid;justify-items:center;gap:8px;margin-top:28px;text-align:center}
 .foot img{opacity:.9}.foot p{margin:0;color:var(--bd-muted);font-size:.8rem;line-height:1.5}

@@ -18,6 +18,9 @@
     <ion-button appPress expand="block" fill="outline" color="secondary" (click)="resend()" [disabled]="sending() || cooldown() > 0 || !net.online()">
       {{ cooldown() ? 'Resend email in ' + cooldown() + 's' : 'Resend email' }}
     </ion-button>
+    @if (devVerify) {
+      <ion-button expand="block" fill="clear" class="dl-link" (click)="verifyLocally()">Verify instantly (local testing only)</ion-button>
+    }
   </main>
   <p class="dl-switch">Can’t find it? Check spam, or <ion-button fill="clear" class="dl-link" (click)="signOut()">use a different account</ion-button></p>
   <div class="dl-page-end"></div>

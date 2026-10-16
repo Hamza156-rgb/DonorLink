@@ -43,6 +43,15 @@ Tokens: `src/theme/variables.scss` (brand navy/red from the logo). Shared UI: `s
 
 Versions: Angular is pinned to 20.3 because the latest stable `@angular/fire` (20.1.1) supports Angular 20 only.
 
+## Live Firebase project
+- Project `donorlink-b261c` (console: https://console.firebase.google.com/project/donorlink-b261c), Spark (free) plan.
+- Firestore `(default)` in **asia-south1 (Mumbai)**, delete protection on. Rules + 12 indexes deployed: `npm run deploy:firestore`.
+- Auth: Email/Password and Anonymous enabled. (Google is enabled in the console but not used by the app yet.)
+- Production builds (`ng build`, the APK) use `environment.prod.ts`; `ionic serve` stays on the emulators. Try the app against the live project: `npm run serve:prod`.
+- Cloud Functions are **not deployed** (need Blaze). `features.contact` is `false` in `environment.prod.ts`, so Contact explains it's coming soon.
+  To switch on: upgrade to Blaze, `firebase deploy --only functions`, set `features.contact: true`, rebuild.
+- Not yet: App Check, Storage, push notifications, Android app registration (needed for FCM/App Check).
+
 ## Setup (real Firebase project)
 1. `npm i -g @ionic/cli firebase-tools` (Node 20+)
 2. (Done: Ionic shell is scaffolded in this repo.)

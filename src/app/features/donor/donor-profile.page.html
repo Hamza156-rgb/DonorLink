@@ -1,0 +1,69 @@
+<ion-content [fullscreen]="true">
+  <header class="dl-hero">
+    <div class="dl-hero-top">
+      <button class="dl-icon-btn" type="button" (click)="back()" aria-label="Back"><ion-icon name="chevron-back" /></button>
+      @if (setup() && isNew()) { <span class="dl-chip">Step 2 of 2</span> }
+    </div>
+    <h1>{{ isNew() ? 'Become a donor' : 'Your donor profile' }}</h1>
+    <p>{{ isNew() ? 'Add your blood group and city so people nearby can find you.' : 'This is what people see in donor search.' }}</p>
+  </header>
+
+  @if (mine() === undefined) {
+    <section class="dl-sheet"><div class="dl-skel" style="height:90px"></div><div class="dl-skel gap" style="height:140px"></div></section>
+  } @else {
+    <section class="dl-sheet">
+      <p class="lbl">How you’ll appear in search</p>
+      <article class="preview dl-card" aria-label="Preview of your listing">
+        <div class="av">{{ initials() }}@if (bloodGroup()) {<span class="bg">{{ bloodGroup() }}</span>}</div>
+        <div class="info">
+          <strong>{{ displayName.trim() || 'Your name' }}</strong>
+          <small><ion-icon name="location-outline" aria-hidden="true" />{{ city ? city + ', ' + province() : 'Choose your city' }}</small>
+          <span class="dl-pill" [class.ok]="availability === 'available'">{{ availabilityLabel[availability] }}</span>
+        </div>
+        @if (!discoverable) { <span class="hidden-tag">Hidden</span> }
+      </article>
+    </section>
+
+    @if (!net.online()) { <p class="dl-info dl-offline gap"><ion-icon name="cloud-offline-outline" />You’re offline. Connect to save your profile.</p> }
+
+    <section class="dl-section form">
+      <h2 class="dl-section-title">Your blood group</h2>
+      <div class="dl-keys" role="radiogroup" aria-label="Your blood group">
+        @for (g of groups; track g) {
+          <button class="dl-key" appPress type="button" role="radio" [attr.aria-checked]="bloodGroup() === g" [class.on]="bloodGroup() === g" (click)="bloodGroup.set(g)">{{ g }}</button>
+        }
+      </div>
+      @if (touched() && !bloodGroup()) { <p class="field-err">Choose your blood group.</p> }
+      <p class="hint">Not sure? Check your donor card or a recent blood test before listing yourself.</p>
+
+      <h2 class="dl-section-title top">Where you can donate</h2>
+      <app-city-picker [(value)]="city" />
+      @if (touched() && !city) { <p class="field-err">Choose your city.</p> }
+
+      <h2 class="dl-section-title top">Availability</h2>
+      <ion-segment [(ngModel)]="availability" aria-label="Availability">
+        @for (a of availabilities; track a) { <ion-segment-button [value]="a">{{ availabilityLabel[a] }}</ion-segment-button> }
+      </ion-segment>
+
+      <h2 class="dl-section-title top">Name shown in search</h2>
+      <ion-input class="name" fill="outline" [(ngModel)]="displayName" maxlength="40" aria-label="Name shown in search"
+        helperText="First name and last initial keeps you hard to identify." [errorText]="nameError" [class.ion-invalid]="touched() && !!nameError" [class.ion-touched]="touched()" />
+
+      <div class="dl-card toggle-row">
+        <ion-toggle [(ngModel)]="discoverable" labelPlacement="start" justify="space-between">
+          <strong>Show me in donor search</strong><br /><small>Turn off to pause without deleting your profile.</small>
+        </ion-toggle>
+      </div>
+
+      <p class="dl-info"><ion-icon name="lock-closed" />Your phone and email are never shown. People send a request, and you choose whether to share your number.</p>
+      <p class="dl-info"><ion-icon name="information-circle-outline" />Listing yourself doesn’t confirm you can donate. The hospital or blood bank checks eligibility before any donation.</p>
+      @if (error()) { <p class="dl-alert" role="alert"><ion-icon name="alert-circle" />{{ error() }}</p> }
+
+      <ion-button appPress class="dl-cta" expand="block" (click)="save()" [disabled]="busy() || !net.online()">
+        @if (busy()) { <ion-spinner name="crescent" aria-label="Saving" /> } @else { {{ isNew() ? 'List me as a donor' : 'Save changes' }} }
+      </ion-button>
+      @if (!isNew()) { <ion-button expand="block" fill="clear" class="remove" (click)="removeListing()">Remove donor profile</ion-button> }
+    </section>
+  }
+  <div class="dl-page-end"></div>
+</ion-content>

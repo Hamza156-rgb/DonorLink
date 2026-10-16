@@ -18,6 +18,25 @@
     <app-art class="urgent-art dl-float" kind="search" />
   </section>
 
+  @if (!guest() && donor() !== undefined) {
+    <section class="dl-section">
+      @if (donor(); as d) {
+        <a class="dl-card join me" appPress routerLink="/tabs/account/donor">
+          <span class="join-ic red">{{ d.bloodGroup }}</span>
+          <div class="join-txt"><h2>{{ d.discoverable ? 'You’re listed as a donor' : 'Your donor profile is hidden' }}</h2>
+            <p class="dl-sub">{{ d.city }} · {{ availabilityLabel[d.availability] }}. Tap to update your availability.</p></div>
+          <ion-icon class="chev" name="chevron-forward" aria-hidden="true" />
+        </a>
+      } @else {
+        <article class="dl-card join">
+          <span class="join-ic"><ion-icon name="heart" aria-hidden="true" /></span>
+          <div class="join-txt"><h2>Become a donor</h2><p class="dl-sub">Add your blood group and city so people nearby can find you.</p></div>
+          <ion-button appPress class="dl-cta" expand="block" routerLink="/tabs/account/donor">Set up donor profile</ion-button>
+        </article>
+      }
+    </section>
+  }
+
   @if (guest()) {
     <section class="dl-section">
       <article class="dl-card join">

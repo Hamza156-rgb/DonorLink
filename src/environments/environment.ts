@@ -4,7 +4,7 @@ export const environment = {
   production: false,
   appVersion: '1.0.0',
   functionsRegion: 'asia-south1',
-  /** Contact workflow needs Cloud Functions (Blaze plan in production). The emulator always has them. */
+  /** Contact runs on Firestore security rules (no Cloud Functions), so it works on the free Spark plan. */
   features: { contact: true },
   useEmulators: true,
   firebase: { projectId: 'demo-donorlink', apiKey: 'demo-api-key', authDomain: 'demo-donorlink.firebaseapp.com', appId: 'demo-app' },

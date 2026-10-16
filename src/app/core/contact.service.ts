@@ -1,16 +1,23 @@
 import { EnvironmentInjector, Injectable, inject, runInInjectionContext } from '@angular/core';
-import { Firestore, collection, collectionData, orderBy, query, where } from '@angular/fire/firestore';
-import { Functions, httpsCallable } from '@angular/fire/functions';
+import { Firestore, Timestamp, collection, collectionData, doc, getDoc, orderBy, query, serverTimestamp, updateDoc, where, writeBatch } from '@angular/fire/firestore';
 import { Observable, map, of, shareReplay, switchMap } from 'rxjs';
 import { AuthService } from './auth.service';
 import { BloodGroup, ContactRequest, Urgency } from './models';
 
 export interface NewContactRequest { toUid: string; bloodGroup: BloodGroup; urgency: Urgency; hospital: string; message: string; }
 
-/** Contact workflow. Writes go through Cloud Functions (rate limits, consent); reads are live and rules-scoped to the two parties. */
+/** A user-facing contact error; authErrorMessage() maps the code to copy. */
+export class ContactError extends Error { constructor(readonly code: string) { super(code); } }
+export const MAX_REQUESTS_PER_HOUR = 5;
+
+/**
+ * Contact workflow without Cloud Functions (works on the free plan): the app writes directly and firestore.rules
+ * enforce everything (verified sender, listed donor, real names, no duplicates, 5/hour, donor-only answers).
+ * The checks here only exist to show a clear message before the rules would refuse.
+ */
 @Injectable({ providedIn: 'root' })
 export class ContactService {
-  private fs = inject(Firestore); private fns = inject(Functions); private inj = inject(EnvironmentInjector);
+  private fs = inject(Firestore); private inj = inject(EnvironmentInjector);
   private auth = inject(AuthService);
 
   private live(field: 'toUid' | 'fromUid'): Observable<ContactRequest[]> {
@@ -26,12 +33,45 @@ export class ContactService {
   readonly pendingReceived$ = this.received$.pipe(map(rs => rs.filter(r => r.status === 'pending').length));
 
   async request(r: NewContactRequest): Promise<string> {
-    const fn = runInInjectionContext(this.inj, () => httpsCallable<NewContactRequest, { id: string }>(this.fns, 'createContactRequest'));
-    return (await fn(r)).data.id;
+    const me = this.auth.current;
+    if (!me || me.isAnonymous || !me.emailVerified) throw new ContactError('contact/need-account');
+    const id = `${me.uid}_${r.toUid}`;
+    return runInInjectionContext(this.inj, async () => {
+      const [existing, donor, profile, quota] = await Promise.all([
+        getDoc(doc(this.fs, 'contactRequests', id)), getDoc(doc(this.fs, 'publicDonorProfiles', r.toUid)),
+        getDoc(doc(this.fs, 'privateProfiles', me.uid)), getDoc(doc(this.fs, 'requestQuota', me.uid))]);
+      if (existing.exists() && existing.data()['status'] !== 'declined') throw new ContactError('contact/already-exists');
+      if (!donor.exists() || donor.data()['discoverable'] !== true) throw new ContactError('contact/not-listed');
+      if (!profile.exists()) throw new ContactError('contact/no-profile');
+      const q = quota.data() as { windowStart?: Timestamp; count?: number } | undefined;
+      const inWindow = !!q?.windowStart && q.windowStart.toMillis() > Date.now() - 3600_000;
+      if (inWindow && (q!.count ?? 0) >= MAX_REQUESTS_PER_HOUR) throw new ContactError('contact/limit');
+
+      const batch = writeBatch(this.fs);
+      batch.set(doc(this.fs, 'contactRequests', id), {
+        fromUid: me.uid, toUid: r.toUid, status: 'pending', fromName: profile.data()['fullName'], toName: donor.data()['displayName'],
+        bloodGroup: r.bloodGroup, urgency: r.urgency, hospital: r.hospital, city: donor.data()['city'], message: r.message,
+        createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+      });
+      batch.set(doc(this.fs, 'requestQuota', me.uid), inWindow
+        ? { windowStart: q!.windowStart, count: (q!.count ?? 0) + 1, lastRequestId: id, lastRequestAt: serverTimestamp() }
+        : { windowStart: serverTimestamp(), count: 1, lastRequestId: id, lastRequestAt: serverTimestamp() });
+      await batch.commit();
+      return id;
+    });
   }
+  /** Donor answers. Accepting shares the donor's own name, mobile and preference with this one requester. */
   async respond(id: string, accept: boolean): Promise<void> {
-    const fn = runInInjectionContext(this.inj, () => httpsCallable<{ id: string; accept: boolean }, unknown>(this.fns, 'respondToContactRequest'));
-    await fn({ id, accept });
+    const me = this.auth.current; if (!me) throw new ContactError('contact/need-account');
+    await runInInjectionContext(this.inj, async () => {
+      const update: Record<string, unknown> = { status: accept ? 'accepted' : 'declined', respondedAt: serverTimestamp(), updatedAt: serverTimestamp() };
+      if (accept) {
+        const p = (await getDoc(doc(this.fs, 'privateProfiles', me.uid))).data();
+        if (!p?.['phone']) throw new ContactError('contact/no-phone');
+        update['sharedContact'] = { name: p['fullName'], phone: p['phone'], preferredContact: p['preferredContact'] };
+      }
+      await updateDoc(doc(this.fs, 'contactRequests', id), update);
+    });
   }
 }
 

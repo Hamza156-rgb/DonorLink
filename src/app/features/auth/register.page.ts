@@ -10,11 +10,12 @@ import { AuthService } from '../../core/auth.service';
 import { authErrorMessage } from '../../core/auth-errors';
 import { PREFERRED_CONTACT, PREFERRED_CONTACT_LABEL, PreferredContact } from '../../core/models';
 import { NetworkService } from '../../core/network.service';
+import { OnboardingService } from '../../core/onboarding.service';
 import { emailValidator, normalizePkMobile, pkMobileValidator } from '../../core/validators';
 
 @Component({ selector:'app-register', imports:[IonContent,IonIcon,IonInput,IonInputPasswordToggle,IonSelect,IonSelectOption,IonButton,IonSpinner,IonRouterLink,RouterLink,ReactiveFormsModule,AuthHeroComponent,PressDirective], templateUrl:'./register.page.html' })
 export class RegisterPage {
-  private auth = inject(AuthService); private router = inject(Router);
+  private auth = inject(AuthService); private router = inject(Router); private onboarding = inject(OnboardingService);
   readonly net = inject(NetworkService);
   /** ?intent=donor from onboarding's "I want to donate". */
   readonly intent = input<string>();
@@ -38,6 +39,7 @@ export class RegisterPage {
     const v = this.form.getRawValue();
     try {
       await this.auth.register({ ...v, fullName: v.fullName.trim(), email: v.email.trim().toLowerCase(), phone: normalizePkMobile(v.phone)! });
+      await this.onboarding.setDonorIntent(this.isDonor());
       await this.router.navigateByUrl('/verify-email', { replaceUrl: true });
     } catch (e) { this.error.set(authErrorMessage(e)); }
     finally { this.busy.set(false); }

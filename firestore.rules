@@ -20,6 +20,18 @@ service cloud.firestore {
         && d.updatedAt == request.time;
     }
 
+    function donorListingOk(d) {
+      return d.keys().hasOnly(['displayName','bloodGroup','province','city','availability','discoverable','verified','updatedAt'])
+        && d.keys().hasAll(['displayName','bloodGroup','province','city','availability','discoverable','verified','updatedAt'])
+        && d.displayName is string && d.displayName.size() >= 2 && d.displayName.size() <= 40
+        && d.bloodGroup in ['A+','A-','B+','B-','AB+','AB-','O+','O-']
+        && d.city is string && d.city.size() >= 2 && d.city.size() <= 60
+        && d.province in ['Punjab','Sindh','Khyber Pakhtunkhwa','Balochistan','Islamabad Capital Territory','Gilgit-Baltistan','Azad Kashmir']
+        && d.availability in ['available','temporarily_unavailable','not_donating']
+        && d.discoverable is bool
+        && d.updatedAt == request.time;
+    }
+
     // Private account data: owner only. role/suspended live in custom claims + server fields.
     match /privateProfiles/{uid} {
       allow read: if me(uid);
@@ -33,10 +45,7 @@ service cloud.firestore {
       allow get: if signed();
       allow list: if signed() && request.query.limit <= 15;
       // Only verified accounts can list themselves as donors.
-      allow create, update: if mine(uid) && verified()
-        && request.resource.data.keys().hasOnly(['displayName','bloodGroup','province','city','availability','discoverable','verified','updatedAt'])
-        && request.resource.data.bloodGroup in ['A+','A-','B+','B-','AB+','AB-','O+','O-']
-        && request.resource.data.availability in ['available','temporarily_unavailable','not_donating']
+      allow create, update: if mine(uid) && verified() && donorListingOk(request.resource.data)
         && request.resource.data.verified == (resource == null ? false : resource.data.verified);
       allow delete: if me(uid);
     }
@@ -48,9 +57,61 @@ service cloud.firestore {
         && keep(['requesterId','status','createdAt']) ;
       allow delete: if false;   // status changes go through Cloud Functions
     }
+    // ---------- Contact workflow (runs on the free plan: every check lives here, no Cloud Functions)
+    function quota() { return /databases/$(db)/documents/requestQuota/$(request.auth.uid); }
+    // A new (or re-sent after decline) request from a verified account to a listed donor.
+    function newRequestOk(id) {
+      let d = request.resource.data;
+      let donor = get(/databases/$(db)/documents/publicDonorProfiles/$(d.toUid)).data;
+      let me = get(/databases/$(db)/documents/privateProfiles/$(request.auth.uid)).data;
+      return verified()
+        && id == request.auth.uid + '_' + d.toUid
+        && d.fromUid == request.auth.uid && d.toUid != request.auth.uid
+        && d.keys().hasOnly(['fromUid','toUid','status','fromName','toName','bloodGroup','urgency','hospital','city','message','createdAt','updatedAt'])
+        && d.keys().hasAll(['fromUid','toUid','status','fromName','toName','bloodGroup','urgency','hospital','city','message','createdAt','updatedAt'])
+        && d.status == 'pending'
+        && d.bloodGroup in ['A+','A-','B+','B-','AB+','AB-','O+','O-']
+        && d.urgency in ['today','this_week','planned']
+        && d.hospital is string && d.hospital.size() >= 2 && d.hospital.size() <= 120
+        && d.message is string && d.message.size() <= 300
+        && d.createdAt == request.time && d.updatedAt == request.time
+        && donor.discoverable == true && d.toName == donor.displayName && d.city == donor.city   // real, listed donor
+        && d.fromName == me.fullName                                                            // requester's real name
+        && !exists(/databases/$(db)/documents/blockedUsers/$(d.toUid)/blocked/$(request.auth.uid))
+        && getAfter(quota()).data.lastRequestId == id && getAfter(quota()).data.lastRequestAt == request.time;  // counted below
+    }
+    // Donor answers. Accepting must share exactly the donor's own name/phone/preference from their private profile.
+    function answerOk() {
+      let d = request.resource.data;
+      let p = get(/databases/$(db)/documents/privateProfiles/$(request.auth.uid)).data;
+      return verified() && resource.data.toUid == request.auth.uid && resource.data.status == 'pending'
+        && d.diff(resource.data).affectedKeys().hasOnly(['status','respondedAt','updatedAt','sharedContact'])
+        && d.respondedAt == request.time && d.updatedAt == request.time
+        && ((d.status == 'declined' && !('sharedContact' in d))
+          || (d.status == 'accepted' && d.sharedContact == { 'name': p.fullName, 'phone': p.phone, 'preferredContact': p.preferredContact }));
+    }
     match /contactRequests/{id} {
-      allow read: if signed() && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
-      allow write: if false;    // created/answered via callable functions (rate-limited)
+      // Only the two people involved. (A missing doc reveals nothing, so the app can check for an open request first.)
+      allow read: if signed() && (resource == null || resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      allow create: if newRequestOk(id);
+      allow update: if (resource.data.fromUid == request.auth.uid && resource.data.status == 'declined' && newRequestOk(id))
+        || answerOk();
+      allow delete: if false;
+    }
+    // Rate limit: max 5 requests per rolling hour window, bumped in the same batch as each request.
+    match /requestQuota/{uid} {
+      allow read: if mine(uid);
+      allow create, update: if mine(uid) && verified()
+        && request.resource.data.keys().hasOnly(['windowStart','count','lastRequestId','lastRequestAt'])
+        && request.resource.data.lastRequestAt == request.time
+        && getAfter(/databases/$(db)/documents/contactRequests/$(request.resource.data.lastRequestId)).data.fromUid == uid
+        && getAfter(/databases/$(db)/documents/contactRequests/$(request.resource.data.lastRequestId)).data.updatedAt == request.time
+        && ((request.resource.data.windowStart == request.time && request.resource.data.count == 1
+              && (resource == null || resource.data.windowStart < request.time - duration.value(1, 'h')))
+          || (resource != null && resource.data.windowStart >= request.time - duration.value(1, 'h')
+              && request.resource.data.windowStart == resource.data.windowStart
+              && request.resource.data.count == resource.data.count + 1 && request.resource.data.count <= 5));
+      allow delete: if false;
     }
     match /donationHistory/{uid}/entries/{e} { allow read, write: if mine(uid); }
     match /blockedUsers/{uid}/blocked/{b}    { allow read, write: if mine(uid); }

@@ -35,6 +35,25 @@
     }
   </section>
 
+  <section class="dl-section" aria-labelledby="donor-title">
+    <h2 class="dl-section-title" id="donor-title">Donor profile</h2>
+    @if (donor() === undefined) { <div class="dl-card donor-card"><div class="dl-skel" style="height:54px;flex:1"></div></div> }
+    @else if (donor(); as d) {
+      <a class="dl-card donor-card" appPress routerLink="/tabs/account/donor">
+        <span class="drop">{{ d.bloodGroup }}</span>
+        <span class="dtxt"><strong>{{ d.discoverable ? 'Listed as a donor' : 'Hidden from search' }}</strong>
+          <small>{{ d.city }} · {{ availabilityLabel[d.availability] }}</small></span>
+        <span class="edit">Edit<ion-icon name="chevron-forward" aria-hidden="true" /></span>
+      </a>
+    } @else {
+      <a class="dl-card donor-card become" appPress routerLink="/tabs/account/donor">
+        <span class="drop empty"><ion-icon name="heart" aria-hidden="true" /></span>
+        <span class="dtxt"><strong>Become a donor</strong><small>Add your blood group and city so people nearby can find you.</small></span>
+        <ion-icon class="go" name="chevron-forward" aria-hidden="true" />
+      </a>
+    }
+  </section>
+
   <section class="dl-section">
     <p class="dl-info"><ion-icon name="information-circle-outline" />Only you can see these details. They’re never shown in donor search.</p>
     <ion-button appPress expand="block" fill="outline" class="signout" (click)="signOut()"><ion-icon slot="start" name="log-out-outline" />Sign out</ion-button>

@@ -1,6 +1,6 @@
 <ion-content [fullscreen]="true">
   <app-auth-hero [heading]="isDonor() ? 'Become a donor' : 'Create your account'"
-    [sub]="isDonor() ? 'Start with a free account. Then add your blood group and city so people nearby can find you.' : 'Join donors and families across Pakistan. It takes a minute.'"
+    [sub]="isDonor() ? 'Step 1 of 2: your account. Next, you’ll add your blood group and city.' : 'Join donors and families across Pakistan. It takes a minute.'"
     [back]="isGuest ? '/tabs/home' : '/login'" />
   <main class="dl-sheet">
     @if (!net.online()) { <p class="dl-info" role="status"><ion-icon name="cloud-offline-outline" />You’re offline. Connect to the internet to create an account.</p> }
