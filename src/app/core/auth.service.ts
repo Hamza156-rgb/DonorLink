@@ -1,10 +1,13 @@
 import { EnvironmentInjector, Injectable, inject, runInInjectionContext } from '@angular/core';
-import { Auth, User, createUserWithEmailAndPassword, getIdToken, reload, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, updateProfile, user } from '@angular/fire/auth';
+import { Auth, EmailAuthProvider, User, createUserWithEmailAndPassword, getIdToken, linkWithCredential, reload, sendEmailVerification, sendPasswordResetEmail, signInAnonymously, signInWithEmailAndPassword, signOut, updateProfile, user } from '@angular/fire/auth';
 import { Firestore, doc, serverTimestamp, setDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { PrivateProfile } from './models';
 
 export interface Registration extends PrivateProfile { password: string; }
+
+/** Anonymous session used for guest search. Guests can browse donors but cannot contact or be listed. */
+export const isGuest = (u: Pick<User, 'isAnonymous'> | null | undefined): boolean => !!u?.isAnonymous;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -16,9 +19,22 @@ export class AuthService {
   /** AngularFire APIs must run inside an injection context; click handlers are not one. */
   private run<T>(fn: () => Promise<T>): Promise<T> { return runInInjectionContext(this.inj, fn); }
 
-  /** Creates the account, the owner-only private profile, then sends the verification email. */
+  /** Starts (or reuses) a guest session so people who need blood can search without an account. */
+  async continueAsGuest(): Promise<User> {
+    const u = this.current; if (u) return u;
+    return (await this.run(() => signInAnonymously(this.auth))).user;
+  }
+
+  /**
+   * Creates the account, the owner-only private profile, then sends the verification email.
+   * A guest is upgraded in place (same uid), so nothing from the guest session is lost.
+   */
   async register(r: Registration): Promise<void> {
-    const { user: u } = await this.run(() => createUserWithEmailAndPassword(this.auth, r.email, r.password));
+    const guest = this.current?.isAnonymous ? this.current : null;
+    const { user: u } = guest
+      ? await this.run(() => linkWithCredential(guest, EmailAuthProvider.credential(r.email, r.password)))
+      : await this.run(() => createUserWithEmailAndPassword(this.auth, r.email, r.password));
+    await this.run(() => getIdToken(u, true));   // rules check token.email when the profile is written
     await this.run(() => updateProfile(u, { displayName: r.fullName }));
     await this.run(() => setDoc(doc(this.fs, 'privateProfiles', u.uid), {
       fullName: r.fullName, email: u.email, phone: r.phone, preferredContact: r.preferredContact,

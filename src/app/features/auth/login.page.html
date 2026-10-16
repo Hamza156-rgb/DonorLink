@@ -21,6 +21,12 @@
       </ion-button>
     </form>
   </main>
+  <div class="dl-or"><span>or</span></div>
+  <button class="dl-card dl-guest" appPress type="button" (click)="searchAsGuest()" [disabled]="guestBusy() || !net.online()">
+    <span class="dl-guest-ic"><ion-icon name="water" aria-hidden="true" /></span>
+    <span><strong>Need blood now?</strong><small>Search donors without an account</small></span>
+    @if (guestBusy()) { <ion-spinner name="crescent" aria-label="Starting" /> }
+  </button>
   <p class="dl-switch">New to DonorLink? <ion-button fill="clear" class="dl-link" routerLink="/register">Create account</ion-button></p>
   <div class="dl-page-end"></div>
 </ion-content>

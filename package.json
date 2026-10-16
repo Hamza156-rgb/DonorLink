@@ -12,7 +12,7 @@
     "lint": "ng lint",
     "test:rules": "npm --prefix tests test",
     "emulators": "firebase emulators:start --project demo-donorlink",
-    "test:rules:ci": "firebase emulators:exec --only auth,firestore --project demo-donorlink \"npm run test:rules\""
+    "test:rules:ci": "npm --prefix functions run build && firebase emulators:exec --only auth,firestore,functions --project demo-donorlink \"npm run test:rules\""
   },
   "private": true,
   "dependencies": {

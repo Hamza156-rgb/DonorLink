@@ -110,3 +110,11 @@ ion-tab-button.tab-selected ion-icon{transform:translateY(-1px)}
 .dl-steps{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:10px;counter-reset:s}
 .dl-steps li{display:flex;gap:12px;align-items:center;line-height:1.4;counter-increment:s}
 .dl-steps li::before{content:counter(s);flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--bd-navy-soft);color:var(--bd-navy);font-weight:800;font-size:.85rem}
+
+// ---------- "or" divider + guest entry card (login)
+.dl-or{display:flex;align-items:center;gap:12px;margin:22px 32px 14px;color:var(--bd-muted);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.dl-or::before,.dl-or::after{content:"";flex:1;height:1px;background:var(--bd-line)}
+.dl-guest{display:flex;align-items:center;gap:14px;width:calc(100% - 32px);margin:0 16px;padding:14px 16px;text-align:left;font-family:var(--ion-font-family);color:var(--bd-ink);box-shadow:0 4px 0 var(--bd-line),var(--bd-shadow-1)}
+.dl-guest strong{display:block;font-size:1rem;font-weight:800}.dl-guest small{color:var(--bd-muted);font-size:.85rem}
+.dl-guest > span:nth-child(2){flex:1}
+.dl-guest-ic{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:14px;background:var(--bd-red-soft);color:var(--bd-red);font-size:1.35rem}

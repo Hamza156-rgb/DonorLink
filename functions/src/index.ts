@@ -19,6 +19,9 @@ export const setAdminRole = onCall(async (req) => {
 /** Rate-limited contact request: max 5 per hour per user; blocked users cannot contact. */
 export const createContactRequest = onCall(async (req) => {
   if (!req.auth) throw new HttpsError('unauthenticated', 'Sign in first.');
+  // Guests (anonymous sessions) can search but not contact; donors only hear from verified accounts.
+  if (req.auth.token.firebase?.sign_in_provider === 'anonymous' || req.auth.token.email_verified !== true)
+    throw new HttpsError('permission-denied', 'Create an account and verify your email to contact donors.');
   const from = req.auth.uid, to = String(req.data?.toUid ?? '');
   if (!to || to === from) throw new HttpsError('invalid-argument', 'Invalid donor.');
   if ((await db.doc(`blockedUsers/${to}/blocked/${from}`).get()).exists) throw new HttpsError('permission-denied', 'Request not allowed.');

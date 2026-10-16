@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 import { assertFails, assertSucceeds, initializeTestEnvironment, RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { setLogLevel, deleteDoc, doc, getDoc, getDocs, collection, serverTimestamp, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import { setLogLevel, addDoc, deleteDoc, doc, getDoc, getDocs, collection, limit, query, serverTimestamp, setDoc, Timestamp, updateDoc, where } from 'firebase/firestore';
 
 setLogLevel('silent'); // denied writes are expected; keep output readable
 let env: RulesTestEnvironment;
@@ -11,6 +11,13 @@ const profile = (over: Record<string, unknown> = {}) => ({
   createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...over,
 });
 const alice = () => env.authenticatedContext('alice', ALICE).firestore();
+const GUEST = { firebase: { sign_in_provider: 'anonymous' } };
+const guest = () => env.authenticatedContext('guest1', GUEST).firestore();
+const verifiedBob = () => env.authenticatedContext('bob', { email: 'bob@example.com', email_verified: true, firebase: { sign_in_provider: 'password' } }).firestore();
+const donor = (over: Record<string, unknown> = {}) => ({ displayName: 'Bob', bloodGroup: 'O+', province: 'Punjab', city: 'Lahore', availability: 'available', discoverable: true, verified: false, updatedAt: serverTimestamp(), ...over });
+const search = (fs: ReturnType<typeof alice>, n?: number) => getDocs(n === undefined
+  ? query(collection(fs, 'publicDonorProfiles'), where('bloodGroup', '==', 'O+'))
+  : query(collection(fs, 'publicDonorProfiles'), where('bloodGroup', '==', 'O+'), limit(n)));
 
 beforeAll(async () => {
   env = await initializeTestEnvironment({
@@ -82,18 +89,43 @@ describe('privateProfiles: read, update, delete', () => {
   it('denied: owner deletes', () => assertFails(deleteDoc(doc(alice(), 'privateProfiles/alice'))));
 });
 
-describe('publicDonorProfiles: read requires verified email', () => {
+describe('publicDonorProfiles: search (guests included)', () => {
   beforeEach(() => env.withSecurityRulesDisabled(c =>
-    setDoc(doc(c.firestore(), 'publicDonorProfiles/d1'), { displayName: 'Donor', bloodGroup: 'O+', province: 'Punjab', city: 'Lahore', availability: 'available', discoverable: true, verified: false, updatedAt: Timestamp.now() })));
+    setDoc(doc(c.firestore(), 'publicDonorProfiles/d1'), { ...donor(), updatedAt: Timestamp.now() })));
 
-  it('verified user can read and list', async () => {
-    const fs = env.authenticatedContext('bob', { email: 'bob@example.com', email_verified: true }).firestore();
-    await assertSucceeds(getDoc(doc(fs, 'publicDonorProfiles/d1')));
-    await assertSucceeds(getDocs(collection(fs, 'publicDonorProfiles')));
+  it('guest can search, 15 per page', () => assertSucceeds(search(guest(), 15)));
+  it('guest can open one donor', () => assertSucceeds(getDoc(doc(guest(), 'publicDonorProfiles/d1'))));
+  it('unverified and verified accounts can search', async () => {
+    await assertSucceeds(search(alice(), 15));
+    await assertSucceeds(search(verifiedBob(), 10));
   });
-  it('denied: signed in but email not verified', async () => {
-    await assertFails(getDoc(doc(alice(), 'publicDonorProfiles/d1')));
-    await assertFails(getDocs(collection(alice(), 'publicDonorProfiles')));
+  it('denied: search without a limit (bulk copy)', () => assertFails(search(guest())));
+  it('denied: more than 15 per page', () => assertFails(search(guest(), 50)));
+  it('denied: no session at all', async () => {
+    await assertFails(search(env.unauthenticatedContext().firestore(), 15));
+    await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'publicDonorProfiles/d1')));
   });
-  it('denied: signed out', () => assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'publicDonorProfiles/d1'))));
+});
+
+describe('publicDonorProfiles: listing yourself needs a verified account', () => {
+  it('verified account can list itself', () => assertSucceeds(setDoc(doc(verifiedBob(), 'publicDonorProfiles/bob'), donor())));
+  it('denied: guest lists itself', () => assertFails(setDoc(doc(guest(), 'publicDonorProfiles/guest1'), donor())));
+  it('denied: unverified account lists itself', () => assertFails(setDoc(doc(alice(), 'publicDonorProfiles/alice'), donor())));
+  it('denied: verified account sets verified=true', () => assertFails(setDoc(doc(verifiedBob(), 'publicDonorProfiles/bob'), donor({ verified: true }))));
+  it('denied: listing someone else', () => assertFails(setDoc(doc(verifiedBob(), 'publicDonorProfiles/carol'), donor())));
+});
+
+describe('guests cannot write account data', () => {
+  it('denied: private profile', () => assertFails(setDoc(doc(guest(), 'privateProfiles/guest1'), profile({ email: 'x@example.com' }))));
+  it('denied: blood request', () => assertFails(addDoc(collection(guest(), 'bloodRequests'), { requesterId: 'guest1', status: 'pending_review', confirmedAccurate: true })));
+  it('denied: report', () => assertFails(addDoc(collection(guest(), 'userReports'), { reporterId: 'guest1' })));
+  it('denied: donation history, blocks, device tokens', async () => {
+    await assertFails(setDoc(doc(guest(), 'donationHistory/guest1/entries/e1'), { at: 1 }));
+    await assertFails(setDoc(doc(guest(), 'blockedUsers/guest1/blocked/x'), { at: 1 }));
+    await assertFails(setDoc(doc(guest(), 'deviceTokens/guest1/tokens/t1'), { at: 1 }));
+  });
+  it('verified account can still create a blood request', () =>
+    assertSucceeds(addDoc(collection(verifiedBob(), 'bloodRequests'), { requesterId: 'bob', status: 'pending_review', confirmedAccurate: true })));
+  it('denied: unverified account creates a blood request', () =>
+    assertFails(addDoc(collection(alice(), 'bloodRequests'), { requesterId: 'alice', status: 'pending_review', confirmedAccurate: true })));
 });

@@ -5,7 +5,11 @@ service cloud.firestore {
     function me(uid) { return signed() && request.auth.uid == uid; }
     function admin() { return signed() && request.auth.token.admin == true; }
     function keep(f) { return !request.resource.data.diff(resource.data).affectedKeys().hasAny(f); }
-    function verified() { return signed() && request.auth.token.email_verified == true; }
+    // Guest = anonymous session (donor search only). account() = real email account, verified() = confirmed email.
+    function guest() { return signed() && request.auth.token.get('firebase', {}).get('sign_in_provider', '') == 'anonymous'; }
+    function account() { return signed() && !guest(); }
+    function mine(uid) { return me(uid) && account(); }
+    function verified() { return account() && request.auth.token.email_verified == true; }
     function privateProfileOk(d) {
       return d.keys().hasOnly(['fullName','phone','email','preferredContact','createdAt','updatedAt'])
         && d.keys().hasAll(['fullName','email','preferredContact','createdAt','updatedAt'])
@@ -19,14 +23,17 @@ service cloud.firestore {
     // Private account data: owner only. role/suspended live in custom claims + server fields.
     match /privateProfiles/{uid} {
       allow read: if me(uid);
-      allow create: if me(uid) && privateProfileOk(request.resource.data) && request.resource.data.createdAt == request.time;
-      allow update: if me(uid) && privateProfileOk(request.resource.data) && keep(['createdAt']);
+      allow create: if mine(uid) && privateProfileOk(request.resource.data) && request.resource.data.createdAt == request.time;
+      allow update: if mine(uid) && privateProfileOk(request.resource.data) && keep(['createdAt']);
       allow delete: if false;
     }
     // Consented, coarse discovery data only. No phone/email/address here.
     match /publicDonorProfiles/{uid} {
-      allow read: if verified();   // unverified accounts cannot browse donors
-      allow create, update: if me(uid)
+      // Anyone with a session (guests included) can search, max 15 per page so the list can't be bulk-copied.
+      allow get: if signed();
+      allow list: if signed() && request.query.limit <= 15;
+      // Only verified accounts can list themselves as donors.
+      allow create, update: if mine(uid) && verified()
         && request.resource.data.keys().hasOnly(['displayName','bloodGroup','province','city','availability','discoverable','verified','updatedAt'])
         && request.resource.data.bloodGroup in ['A+','A-','B+','B-','AB+','AB-','O+','O-']
         && request.resource.data.availability in ['available','temporarily_unavailable','not_donating']
@@ -35,9 +42,9 @@ service cloud.firestore {
     }
     match /bloodRequests/{id} {
       allow read: if signed() && (resource.data.status in ['open','in_progress'] || resource.data.requesterId == request.auth.uid || admin());
-      allow create: if signed() && request.resource.data.requesterId == request.auth.uid
+      allow create: if verified() && request.resource.data.requesterId == request.auth.uid
         && request.resource.data.status == 'pending_review' && request.resource.data.confirmedAccurate == true;
-      allow update: if signed() && resource.data.requesterId == request.auth.uid
+      allow update: if verified() && resource.data.requesterId == request.auth.uid
         && keep(['requesterId','status','createdAt']) ;
       allow delete: if false;   // status changes go through Cloud Functions
     }
@@ -45,11 +52,11 @@ service cloud.firestore {
       allow read: if signed() && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
       allow write: if false;    // created/answered via callable functions (rate-limited)
     }
-    match /donationHistory/{uid}/entries/{e} { allow read, write: if me(uid); }
-    match /blockedUsers/{uid}/blocked/{b}    { allow read, write: if me(uid); }
+    match /donationHistory/{uid}/entries/{e} { allow read, write: if mine(uid); }
+    match /blockedUsers/{uid}/blocked/{b}    { allow read, write: if mine(uid); }
     match /userNotifications/{uid}/items/{n} { allow read: if me(uid); allow update: if me(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']); }
-    match /deviceTokens/{uid}/tokens/{t}     { allow read, write: if me(uid); }
-    match /userReports/{id} { allow create: if signed() && request.resource.data.reporterId == request.auth.uid; allow read: if admin(); }
+    match /deviceTokens/{uid}/tokens/{t}     { allow read, write: if mine(uid); }
+    match /userReports/{id} { allow create: if account() && request.resource.data.reporterId == request.auth.uid; allow read: if admin(); }
     match /appAnnouncements/{id} { allow read: if true; allow write: if admin(); }
     match /{coll}/{doc=**} { allow read, write: if coll in ['adminAuditLogs','platformSettings','verificationSubmissions'] && admin() && request.method == 'get' || false; }
   }

@@ -4,6 +4,8 @@ const MESSAGES: Record<string,string> = {
   'auth/wrong-password': 'Email or password is incorrect. Check them and try again, or reset your password.',
   'auth/user-not-found': 'Email or password is incorrect. Check them and try again, or reset your password.',
   'auth/email-already-in-use': 'An account with this email already exists. Sign in, or reset your password.',
+  'auth/credential-already-in-use': 'An account with this email already exists. Sign in, or reset your password.',
+  'auth/operation-not-allowed': 'Guest search isn’t available right now. Create an account or sign in.',
   'auth/invalid-email': 'Enter a valid email address, like name@example.com.',
   'auth/weak-password': 'Use a password with at least 8 characters.',
   'auth/too-many-requests': 'Too many attempts. Wait a few minutes, then try again.',

@@ -7,13 +7,31 @@
 
     <div class="track" #track (scroll)="onScroll()" aria-roledescription="carousel">
       @for (s of slides; track s.title; let i = $index) {
-        <section class="slide" [attr.aria-hidden]="i !== index()" aria-roledescription="slide" [attr.aria-label]="(i + 1) + ' of ' + slides.length">
-          <div class="orb">
-            @if (s.art === 'logo') { <img class="dl-float logo" src="assets/brand/logo-mark.png" alt="" width="180" height="175" /> }
-            @else { <app-art class="dl-float art" [kind]="s.art" /> }
-          </div>
-          <h1>{{ s.title }}</h1>
-          <p>{{ s.body }}</p>
+        <section class="slide" [class.choice-slide]="s.art === 'choice'" [attr.aria-hidden]="i !== index()" aria-roledescription="slide" [attr.aria-label]="(i + 1) + ' of ' + slides.length">
+          @if (s.art === 'choice') {
+            <h1>{{ s.title }}</h1>
+            <div class="choices">
+              <button class="choice" appPress type="button" (click)="needBlood()" [disabled]="busy()">
+                <span class="ic need"><ion-icon name="water" aria-hidden="true" /></span>
+                <span class="txt"><strong>I need blood</strong><small>Search donors now. No account needed.</small></span>
+                @if (busy()) { <ion-spinner name="crescent" aria-label="Starting" /> } @else { <ion-icon class="go" name="chevron-forward" aria-hidden="true" /> }
+              </button>
+              <button class="choice" appPress type="button" (click)="donate()">
+                <span class="ic give"><ion-icon name="heart" aria-hidden="true" /></span>
+                <span class="txt"><strong>I want to donate</strong><small>Create a free account and get listed.</small></span>
+                <ion-icon class="go" name="chevron-forward" aria-hidden="true" />
+              </button>
+            </div>
+            @if (error()) { <p class="err" role="alert">{{ error() }}</p> }
+            <p class="safety"><ion-icon name="information-circle-outline" aria-hidden="true" />{{ s.body }}</p>
+          } @else {
+            <div class="orb">
+              @if (s.art === 'logo') { <img class="dl-float logo" src="assets/brand/logo-mark.png" alt="" width="180" height="175" /> }
+              @else { <app-art class="dl-float art" [kind]="s.art" /> }
+            </div>
+            <h1>{{ s.title }}</h1>
+            <p>{{ s.body }}</p>
+          }
         </section>
       }
     </div>
@@ -25,8 +43,7 @@
         }
       </div>
       @if (last) {
-        <ion-button appPress class="dl-cta" expand="block" (click)="finish('/register')">Create account</ion-button>
-        <ion-button appPress class="dl-ghost" expand="block" fill="outline" (click)="finish('/login')">I already have an account</ion-button>
+        <p class="signin">Already have an account? <ion-button fill="clear" class="dl-ghost-link" (click)="signIn()">Sign in</ion-button></p>
       } @else {
         <ion-button appPress class="dl-cta" expand="block" (click)="next()">Next</ion-button>
       }

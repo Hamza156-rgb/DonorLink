@@ -10,5 +10,9 @@ dd{margin:0 0 0 auto;max-width:100%;font-weight:700;text-align:right;overflow-wr
 .sk{display:inline-block;width:110px;height:14px}
 .since{margin:12px 0 0;color:var(--bd-muted);font-size:.82rem}
 .signout{margin-top:14px;--color:var(--bd-red);--border-color:var(--bd-red)}
+.guest{display:grid;gap:12px;text-align:center}.guest h2{margin:0;font-size:1.2rem;font-weight:800}
+.perks{margin:0;padding:0;list-style:none;display:grid;gap:8px;text-align:left}
+.perks li{display:flex;gap:10px;align-items:center;font-weight:600}.perks ion-icon{color:var(--bd-navy);font-size:1.2rem;flex:none}
+.avatar ion-icon{font-size:2.2rem}
 .foot{display:grid;justify-items:center;gap:8px;margin-top:28px;text-align:center}
 .foot img{opacity:.9}.foot p{margin:0;color:var(--bd-muted);font-size:.8rem;line-height:1.5}

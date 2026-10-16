@@ -1,9 +1,23 @@
 <ion-content [fullscreen]="true">
   <header class="dl-hero center">
-    <div class="ring"><div class="avatar">{{ initials() }}</div></div>
-    <h1>{{ user()?.displayName || 'Your account' }}</h1>
-    @if (user()?.emailVerified) { <span class="dl-chip"><ion-icon name="shield-checkmark" aria-hidden="true" />Email verified</span> }
+    <div class="ring"><div class="avatar">@if (guest()) {<ion-icon name="person" aria-hidden="true" />} @else {{{ initials() }}}</div></div>
+    <h1>{{ guest() ? 'Guest' : (user()?.displayName || 'Your account') }}</h1>
+    @if (guest()) { <span class="dl-chip">Browsing as a guest</span> }
+    @else if (user()?.emailVerified) { <span class="dl-chip"><ion-icon name="shield-checkmark" aria-hidden="true" />Email verified</span> }
   </header>
+
+  @if (guest()) {
+    <section class="dl-sheet guest">
+      <app-art class="dl-art-sm dl-float" kind="care" />
+      <h2>Get more from DonorLink</h2>
+      <ul class="perks">@for (p of perks; track p) { <li><ion-icon name="checkmark-circle" aria-hidden="true" />{{ p }}</li> }</ul>
+      <ion-button appPress class="dl-cta" expand="block" routerLink="/register">Create free account</ion-button>
+      <ion-button appPress expand="block" fill="outline" color="secondary" routerLink="/login">Sign in</ion-button>
+    </section>
+    <section class="dl-section">
+      <ion-button expand="block" fill="clear" class="dl-link" (click)="signOut()">End guest session</ion-button>
+    </section>
+  } @else {
 
   <section class="dl-sheet" aria-labelledby="details-title">
     <h2 class="dl-section-title" id="details-title">Account details</h2>
@@ -25,6 +39,8 @@
     <p class="dl-info"><ion-icon name="information-circle-outline" />Only you can see these details. They’re never shown in donor search.</p>
     <ion-button appPress expand="block" fill="outline" class="signout" (click)="signOut()"><ion-icon slot="start" name="log-out-outline" />Sign out</ion-button>
   </section>
+
+  }
 
   <footer class="foot">
     <img src="assets/brand/logo-wordmark.png" alt="DonorLink" width="140" height="26" />

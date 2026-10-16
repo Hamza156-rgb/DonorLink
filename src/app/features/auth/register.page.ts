@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonInput, IonInputPasswordToggle, IonRouterLink, IonSelect, IonSelectOption, IonSpinner } from '@ionic/angular';
@@ -16,6 +16,10 @@ import { emailValidator, normalizePkMobile, pkMobileValidator } from '../../core
 export class RegisterPage {
   private auth = inject(AuthService); private router = inject(Router);
   readonly net = inject(NetworkService);
+  /** ?intent=donor from onboarding's "I want to donate". */
+  readonly intent = input<string>();
+  readonly isDonor = computed(() => this.intent() === 'donor');
+  readonly isGuest = !!this.auth.current?.isAnonymous;
   contacts = PREFERRED_CONTACT; contactLabel = PREFERRED_CONTACT_LABEL;
   form = inject(FormBuilder).nonNullable.group({
     fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(80)]],

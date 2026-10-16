@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, entryGuard, guestGuard, verifiedGuard } from './core/auth.guards';
+import { appGuard, authGuard, entryGuard, guestGuard } from './core/auth.guards';
 
 const auth = () => import('./features/auth/routes');
 
@@ -11,7 +11,7 @@ export const routes: Routes = [
   { path: 'reset-password', canActivate: [guestGuard], loadComponent: () => auth().then((m) => m.ResetPasswordPage) },
   { path: 'verify-email', canActivate: [authGuard], loadComponent: () => auth().then((m) => m.VerifyEmailPage) },
   {
-    path: 'tabs', canActivate: [verifiedGuard], loadComponent: () => import('./features/tabs/tabs.page').then((m) => m.TabsPage),
+    path: 'tabs', canActivate: [appGuard], loadComponent: () => import('./features/tabs/tabs.page').then((m) => m.TabsPage),
     children: [
       { path: 'home', loadComponent: () => import('./features/home/home.page').then((m) => m.HomePage) },
       { path: 'donors', loadComponent: () => import('./features/donors/donor-search.page').then((m) => m.DonorSearchPage) },

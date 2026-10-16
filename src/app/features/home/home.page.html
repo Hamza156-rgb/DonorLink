@@ -2,10 +2,10 @@
   <header class="dl-hero">
     <div class="dl-hero-top">
       <span class="dl-brand"><span class="dl-logo-badge"><img src="assets/brand/logo-mark.png" alt="" width="32" height="31" /></span>DonorLink</span>
-      <a class="avatar" routerLink="/tabs/account" aria-label="Your account">{{ initials() }}</a>
+      <a class="avatar" routerLink="/tabs/account" aria-label="Your account">@if (guest()) {<ion-icon name="person" aria-hidden="true" />} @else {{{ initials() }}}</a>
     </div>
     <p class="hello">{{ greeting }},</p>
-    <h1>{{ firstName() }}</h1>
+    <h1 class="name">{{ firstName() }}</h1>
     <p>Every drop connects a life.</p>
   </header>
 
@@ -17,6 +17,16 @@
     </div>
     <app-art class="urgent-art dl-float" kind="search" />
   </section>
+
+  @if (guest()) {
+    <section class="dl-section">
+      <article class="dl-card join">
+        <span class="join-ic"><ion-icon name="heart" aria-hidden="true" /></span>
+        <div class="join-txt"><h2>You’re browsing as a guest</h2><p class="dl-sub">Create a free account to contact donors, or to list yourself as a donor.</p></div>
+        <ion-button appPress fill="outline" color="secondary" expand="block" routerLink="/register">Create free account</ion-button>
+      </article>
+    </section>
+  }
 
   <section class="dl-section" aria-labelledby="groups-title">
     <h2 class="dl-section-title" id="groups-title">Search by blood group</h2>

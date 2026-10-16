@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonButton, IonContent, IonIcon, IonInput, IonInputPasswordToggle, IonRouterLink, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { alertCircle, cloudOfflineOutline, lockClosedOutline, mailOutline } from 'ionicons/icons';
+import { alertCircle, cloudOfflineOutline, lockClosedOutline, mailOutline, water } from 'ionicons/icons';
 import { AuthHeroComponent } from '../../shared/auth-hero.component';
 import { PressDirective } from '../../shared/press.directive';
 import { AuthService } from '../../core/auth.service';
@@ -17,8 +17,17 @@ export class LoginPage {
   readonly net = inject(NetworkService);
   readonly returnUrl = input<string>();
   form = inject(FormBuilder).nonNullable.group({ email: ['', [Validators.required, emailValidator]], password: ['', Validators.required] });
-  busy = signal(false); error = signal('');
-  constructor() { addIcons({ alertCircle, cloudOfflineOutline, lockClosedOutline, mailOutline }); }
+  busy = signal(false); guestBusy = signal(false); error = signal('');
+  constructor() { addIcons({ alertCircle, cloudOfflineOutline, lockClosedOutline, mailOutline, water }); }
+
+  /** People who need blood can search right away, without an account. */
+  async searchAsGuest() {
+    if (this.guestBusy()) return;
+    this.guestBusy.set(true); this.error.set('');
+    try { await this.auth.continueAsGuest(); await this.router.navigateByUrl('/tabs/donors', { replaceUrl: true }); }
+    catch (e) { this.error.set(authErrorMessage(e)); }
+    finally { this.guestBusy.set(false); }
+  }
 
   async submit() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }

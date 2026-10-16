@@ -1,4 +1,9 @@
 .hello{margin:0 0 2px!important}
+.name{text-transform:capitalize}
+.join{display:grid;grid-template-columns:auto 1fr;gap:12px 14px;align-items:center;padding:16px}
+.join ion-button{grid-column:1/-1;margin:0}
+.join h2{margin:0 0 2px;font-size:1rem;font-weight:800}
+.join-ic{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--bd-navy-soft);color:var(--bd-navy);font-size:1.3rem}
 .avatar{display:grid;place-items:center;width:var(--bd-tap);height:var(--bd-tap);border-radius:50%;background:var(--bd-card);color:var(--bd-navy);font-weight:800;text-decoration:none;box-shadow:0 8px 18px -6px rgba(0,0,0,.45)}
 .urgent{display:flex;align-items:center;gap:8px;overflow:hidden}
 .urgent h2{margin:0 0 4px;font-size:1.3rem;font-weight:800}

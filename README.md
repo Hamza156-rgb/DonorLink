@@ -23,6 +23,12 @@ If you change `angular.json` (styles, fonts, budgets), restart `ionic serve`; th
 - Debug APK: `ionic build && npx cap sync android && (cd android && ./gradlew assembleDebug)` (needs Java 21 and `ANDROID_HOME=~/Library/Android/sdk`).
 - A phone can't reach emulators at 127.0.0.1; the device build needs the real Firebase project (next step).
 
+## Access model
+- Guest ("I need blood"): anonymous Firebase session; can search donors (rules cap each page at 15). Cannot contact, list, or post.
+- Account: email + password; a guest who signs up is upgraded in place (same uid).
+- Verified account: can list as a donor, post blood requests, and contact donors (`createContactRequest` refuses guests and unverified accounts).
+- Firebase console: enable Anonymous and Email/Password sign-in, and App Check before launch.
+
 ## Design system
 Tokens: `src/theme/variables.scss` (brand navy/red from the logo). Shared UI: `src/theme/ui.scss` (`dl-` classes: hero, sheet, keycaps, raised CTA, alerts, skeletons).
 `appPress` directive adds the pressed state and a light haptic on devices. Illustrations are inline SVG (`app-art`), font is bundled (no remote assets).
