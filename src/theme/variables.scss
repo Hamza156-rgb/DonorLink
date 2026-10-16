@@ -1,0 +1,12 @@
+:root{
+ --ion-font-family:"Inter","Segoe UI",Roboto,system-ui,sans-serif;
+ --bd-ink:#161B22; --bd-muted:#5B6573; --bd-paper:#F4F6F8; --bd-card:#FFFFFF; --bd-line:#E1E5EA;
+ --bd-red:#B3202A; --bd-red-soft:#FBE9EA; --bd-ok:#1D7A55; --bd-ok-soft:#E3F3EC;
+ --ion-color-primary:var(--bd-red); --ion-color-primary-contrast:#fff;
+ --ion-background-color:var(--bd-paper); --ion-text-color:var(--bd-ink);
+ --bd-r-sm:10px; --bd-r-lg:20px; --bd-tap:48px;
+}
+h1,h2,h3{letter-spacing:-.01em;line-height:1.2}
+ion-button{--border-radius:var(--bd-r-sm);min-height:var(--bd-tap);font-weight:600;text-transform:none}
+:focus-visible{outline:3px solid #1B5FD6;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

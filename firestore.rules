@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function signed() { return request.auth != null; }
+    function me(uid) { return signed() && request.auth.uid == uid; }
+    function admin() { return signed() && request.auth.token.admin == true; }
+    function keep(f) { return !request.resource.data.diff(resource.data).affectedKeys().hasAny(f); }
+
+    // Private account data: owner only. role/suspended live in custom claims + server fields.
+    match /privateProfiles/{uid} {
+      allow read: if me(uid);
+      allow create: if me(uid) && request.resource.data.keys().hasOnly(['fullName','phone','email','preferredContact','createdAt','updatedAt']);
+      allow update: if me(uid) && keep(['createdAt']);
+      allow delete: if false;
+    }
+    // Consented, coarse discovery data only. No phone/email/address here.
+    match /publicDonorProfiles/{uid} {
+      allow read: if signed();
+      allow create, update: if me(uid)
+        && request.resource.data.keys().hasOnly(['displayName','bloodGroup','province','city','availability','discoverable','verified','updatedAt'])
+        && request.resource.data.bloodGroup in ['A+','A-','B+','B-','AB+','AB-','O+','O-']
+        && request.resource.data.availability in ['available','temporarily_unavailable','not_donating']
+        && request.resource.data.verified == (resource == null ? false : resource.data.verified);
+      allow delete: if me(uid);
+    }
+    match /bloodRequests/{id} {
+      allow read: if signed() && (resource.data.status in ['open','in_progress'] || resource.data.requesterId == request.auth.uid || admin());
+      allow create: if signed() && request.resource.data.requesterId == request.auth.uid
+        && request.resource.data.status == 'pending_review' && request.resource.data.confirmedAccurate == true;
+      allow update: if signed() && resource.data.requesterId == request.auth.uid
+        && keep(['requesterId','status','createdAt']) ;
+      allow delete: if false;   // status changes go through Cloud Functions
+    }
+    match /contactRequests/{id} {
+      allow read: if signed() && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      allow write: if false;    // created/answered via callable functions (rate-limited)
+    }
+    match /donationHistory/{uid}/entries/{e} { allow read, write: if me(uid); }
+    match /blockedUsers/{uid}/blocked/{b}    { allow read, write: if me(uid); }
+    match /userNotifications/{uid}/items/{n} { allow read: if me(uid); allow update: if me(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']); }
+    match /deviceTokens/{uid}/tokens/{t}     { allow read, write: if me(uid); }
+    match /userReports/{id} { allow create: if signed() && request.resource.data.reporterId == request.auth.uid; allow read: if admin(); }
+    match /appAnnouncements/{id} { allow read: if true; allow write: if admin(); }
+    match /{coll}/{doc=**} { allow read, write: if coll in ['adminAuditLogs','platformSettings','verificationSubmissions'] && admin() && request.method == 'get' || false; }
+  }
+}

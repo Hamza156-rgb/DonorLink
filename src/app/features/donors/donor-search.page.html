@@ -1,0 +1,36 @@
+<ion-header class="ion-no-border"><ion-toolbar><ion-title>Find donors</ion-title></ion-toolbar></ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="run().then(()=>$any($event).target.complete())"><ion-refresher-content/></ion-refresher>
+  <section class="picker" aria-label="Choose blood group">
+    <h2>Which blood group do you need?</h2>
+    <div class="groups" role="radiogroup">
+      @for (g of groups; track g) {
+        <button class="grp" role="radio" [attr.aria-checked]="group()===g" [class.on]="group()===g" (click)="pick(g)">{{g}}</button>
+      }
+    </div>
+    <div class="row">
+      <ion-select label="City" labelPlacement="stacked" interface="action-sheet" [(ngModel)]="city" (ionChange)="run()">
+        <ion-select-option value="">All cities</ion-select-option>
+        @for (c of cities; track c) { <ion-select-option [value]="c">{{c}}</ion-select-option> }
+      </ion-select>
+      <ion-toggle [(ngModel)]="availableOnly" (ionChange)="run()">Available now</ion-toggle>
+    </div>
+  </section>
+  @if (error()) { <p class="msg err" role="alert">{{error()}} <a (click)="run()">Retry</a></p> }
+  @if (loading() && !items().length) { @for (i of [1,2,3]; track i) { <div class="card skel"></div> } }
+  @if (!group()) { <p class="msg">Pick a blood group to see donors who chose to be listed.</p> }
+  @else if (searched() && !loading() && !items().length && !error()) {
+    <div class="msg"><strong>No donors listed for {{group()}} yet.</strong><br>Try all cities, or post a blood request so nearby donors are notified.</div>
+  }
+  @for (d of items(); track d.uid) {
+    <article class="card">
+      <div class="bg">{{d.bloodGroup}}</div>
+      <div class="info"><h3>{{d.displayName}} @if (d.verified) {<ion-icon name="shield-checkmark" aria-label="Verified"/>}</h3>
+        <p>{{d.city}}, {{d.province}}</p>
+        <span class="pill" [class.ok]="d.availability==='available'">{{d.availability==='available' ? 'Available' : 'Not available now'}}</span></div>
+      <ion-button size="small" [routerLink]="['/donors', d.uid, 'contact']">Request contact</ion-button>
+    </article>
+  }
+  @if (more()) { <ion-button fill="clear" expand="block" (click)="run(false)" [disabled]="loading()">Load more</ion-button> }
+  <p class="note">Blood group alone does not confirm someone can safely donate. Confirm with the hospital or blood bank.</p>
+</ion-content>

@@ -1,0 +1,4 @@
+{"indexes":[
+{"collectionGroup":"publicDonorProfiles","queryScope":"COLLECTION","fields":[{"fieldPath":"discoverable","order":"ASCENDING"},{"fieldPath":"bloodGroup","order":"ASCENDING"},{"fieldPath":"city","order":"ASCENDING"},{"fieldPath":"availability","order":"ASCENDING"},{"fieldPath":"updatedAt","order":"DESCENDING"}]},
+{"collectionGroup":"bloodRequests","queryScope":"COLLECTION","fields":[{"fieldPath":"status","order":"ASCENDING"},{"fieldPath":"bloodGroup","order":"ASCENDING"},{"fieldPath":"city","order":"ASCENDING"},{"fieldPath":"neededBy","order":"ASCENDING"}]}
+],"fieldOverrides":[]}
