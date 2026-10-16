@@ -9,3 +9,15 @@ export type PreferredContact = typeof PREFERRED_CONTACT[number];
 export const PREFERRED_CONTACT_LABEL: Record<PreferredContact,string> = { in_app:'In-app messages', phone:'Phone call', whatsapp:'WhatsApp' };
 /** Owner-only document at privateProfiles/{uid}. Never copied into publicDonorProfiles. */
 export interface PrivateProfile { fullName: string; email: string; phone: string; preferredContact: PreferredContact; }
+
+export const URGENCY = ['today','this_week','planned'] as const;
+export type Urgency = typeof URGENCY[number];
+export const URGENCY_LABEL: Record<Urgency,string> = { today:'Needed today', this_week:'This week', planned:'Planned' };
+export type ContactStatus = 'pending' | 'accepted' | 'declined';
+/** contactRequests/{fromUid_toUid}. Written only by Cloud Functions; sharedContact appears only after the donor accepts. */
+export interface ContactRequest {
+  id: string; fromUid: string; toUid: string; status: ContactStatus;
+  fromName: string; toName: string; bloodGroup: BloodGroup; urgency: Urgency; hospital: string; city: string; message: string;
+  createdAt?: { toDate(): Date }; respondedAt?: { toDate(): Date };
+  sharedContact?: { name: string; phone: string; preferredContact: PreferredContact };
+}

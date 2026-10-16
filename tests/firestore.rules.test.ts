@@ -129,3 +129,25 @@ describe('guests cannot write account data', () => {
   it('denied: unverified account creates a blood request', () =>
     assertFails(addDoc(collection(alice(), 'bloodRequests'), { requesterId: 'alice', status: 'pending_review', confirmedAccurate: true })));
 });
+
+describe('contactRequests: only the two people involved can read; nobody writes directly', () => {
+  const req = { fromUid: 'sara', toUid: 'bob', status: 'accepted', fromName: 'Sara', toName: 'Bob', bloodGroup: 'O+', urgency: 'today', hospital: 'Mayo', city: 'Lahore', message: '',
+    sharedContact: { name: 'Bob', phone: '+923000000001', preferredContact: 'phone' }, createdAt: Timestamp.now() };
+  const as = (uid: string) => env.authenticatedContext(uid, { email: `${uid}@example.com`, email_verified: true, firebase: { sign_in_provider: 'password' } }).firestore();
+  beforeEach(() => env.withSecurityRulesDisabled(c => setDoc(doc(c.firestore(), 'contactRequests/sara_bob'), req)));
+
+  it('requester and donor can read it', async () => {
+    await assertSucceeds(getDoc(doc(as('sara'), 'contactRequests/sara_bob')));
+    await assertSucceeds(getDoc(doc(as('bob'), 'contactRequests/sara_bob')));
+  });
+  it('each can list their own side', async () => {
+    await assertSucceeds(getDocs(query(collection(as('sara'), 'contactRequests'), where('fromUid', '==', 'sara'))));
+    await assertSucceeds(getDocs(query(collection(as('bob'), 'contactRequests'), where('toUid', '==', 'bob'))));
+  });
+  it('denied: a third person reads it (the shared number stays private)', () => assertFails(getDoc(doc(as('eve'), 'contactRequests/sara_bob'))));
+  it('denied: listing someone else’s requests', () => assertFails(getDocs(query(collection(as('eve'), 'contactRequests'), where('toUid', '==', 'bob')))));
+  it('denied: listing without a filter', () => assertFails(getDocs(collection(as('sara'), 'contactRequests'))));
+  it('denied: guest reads it', () => assertFails(getDoc(doc(guest(), 'contactRequests/sara_bob'))));
+  it('denied: donor accepts by writing directly (must use the function)', () => assertFails(updateDoc(doc(as('bob'), 'contactRequests/sara_bob'), { status: 'accepted' })));
+  it('denied: requester creates a request directly', () => assertFails(setDoc(doc(as('sara'), 'contactRequests/sara_carl'), { ...req, toUid: 'carl', status: 'pending' })));
+});

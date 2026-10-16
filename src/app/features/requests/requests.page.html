@@ -1,0 +1,91 @@
+<ion-content [fullscreen]="true">
+  <header class="dl-hero">
+    <h1>Requests</h1>
+    <p>Contact requests you’ve received as a donor, and the ones you’ve sent.</p>
+  </header>
+
+  @if (guest()) {
+    <section class="dl-sheet center">
+      <app-art class="dl-art-sm dl-float" kind="mail" />
+      <h2>Contact donors with a free account</h2>
+      <p class="dl-sub">Guests can search donors. To send or receive contact requests, create an account. It takes about a minute.</p>
+      <ion-button appPress class="dl-cta" expand="block" routerLink="/register">Create free account</ion-button>
+      <ion-button appPress expand="block" fill="outline" color="secondary" routerLink="/login">Sign in</ion-button>
+    </section>
+  } @else {
+    <section class="dl-sheet seg">
+      <ion-segment [value]="tab()" (ionChange)="setView($event)">
+        <ion-segment-button value="received">Received @if (pending()) {<span class="count">{{ pending() }}</span>}</ion-segment-button>
+        <ion-segment-button value="sent">Sent</ion-segment-button>
+      </ion-segment>
+    </section>
+
+    @if (!net.online()) { <p class="dl-info dl-offline gap"><ion-icon name="information-circle-outline" />You’re offline. Showing your last saved requests.</p> }
+    @if (loadError()) { <p class="dl-alert dl-offline gap" role="alert">Couldn’t load requests. Pull down or reopen this tab to try again.</p> }
+
+    <section class="list" aria-live="polite">
+      @if (tab() === 'received') {
+        @if (received() === undefined) { @for (i of [1,2]; track i) { <div class="dl-card sk"><div class="dl-skel"></div><div class="dl-skel"></div><div class="dl-skel"></div></div> } }
+        @else if (!received()?.length) {
+          <div class="state"><app-art class="state-art" kind="care" /><h3>No requests yet</h3><p class="dl-sub">When someone needs your blood group, their request will appear here. You decide whether to share your number.</p></div>
+        }
+        @for (r of received() ?? []; track r.id) {
+          <article class="dl-card req" [class.pending]="r.status === 'pending'">
+            <div class="top">
+              <div class="av">{{ initials(r.fromName) }}</div>
+              <div class="who"><strong>{{ r.fromName }}</strong><small>{{ ago(r) }}</small></div>
+              <span class="need">{{ r.bloodGroup }}</span>
+            </div>
+            <p class="meta"><ion-icon name="medkit-outline" aria-hidden="true" />{{ r.hospital }}</p>
+            <p class="meta"><ion-icon name="time-outline" aria-hidden="true" />{{ urgencyLabel[r.urgency] }}</p>
+            @if (r.message) { <blockquote>“{{ r.message }}”</blockquote> }
+            @switch (r.status) {
+              @case ('pending') {
+                <div class="actions">
+                  <ion-button appPress fill="outline" color="medium" (click)="answer(r, false)" [disabled]="busyId() === r.id">Decline</ion-button>
+                  <ion-button appPress class="dl-cta" (click)="answer(r, true)" [disabled]="busyId() === r.id">
+                    @if (busyId() === r.id) { <ion-spinner name="crescent" /> } @else { Accept }
+                  </ion-button>
+                </div>
+              }
+              @case ('accepted') { <p class="status ok-navy"><ion-icon name="checkmark-circle" aria-hidden="true" />You shared your number. Expect a call or WhatsApp.</p> }
+              @default { <p class="status"><ion-icon name="close-circle" aria-hidden="true" />You declined this request.</p> }
+            }
+          </article>
+        }
+      } @else {
+        @if (sent() === undefined) { @for (i of [1,2]; track i) { <div class="dl-card sk"><div class="dl-skel"></div><div class="dl-skel"></div><div class="dl-skel"></div></div> } }
+        @else if (!sent()?.length) {
+          <div class="state"><app-art class="state-art" kind="search" /><h3>You haven’t contacted anyone yet</h3><p class="dl-sub">Find a donor and tap Contact. Their reply will show here.</p>
+            <ion-button appPress class="dl-cta" routerLink="/tabs/donors">Find donors</ion-button></div>
+        }
+        @for (r of sent() ?? []; track r.id) {
+          <article class="dl-card req">
+            <div class="top">
+              <div class="av">{{ initials(r.toName) }}</div>
+              <div class="who"><strong>{{ r.toName }}</strong><small><ion-icon name="location-outline" aria-hidden="true" />{{ r.city }} · {{ ago(r) }}</small></div>
+              <span class="need">{{ r.bloodGroup }}</span>
+            </div>
+            <p class="meta"><ion-icon name="medkit-outline" aria-hidden="true" />{{ r.hospital }}</p>
+            @switch (r.status) {
+              @case ('pending') { <p class="status"><span class="dot"></span>Waiting for {{ r.toName }} to reply</p> }
+              @case ('accepted') {
+                <div class="shared">
+                  <p class="shared-t"><ion-icon name="checkmark-circle" aria-hidden="true" />{{ r.sharedContact?.name }} accepted</p>
+                  <p class="phone">{{ phone(r.sharedContact?.phone ?? '') }}</p>
+                  <div class="actions">
+                    <a class="act call" appPress [href]="'tel:' + r.sharedContact?.phone"><ion-icon name="call" aria-hidden="true" />Call</a>
+                    <a class="act wa" appPress [href]="wa(r)" target="_blank" rel="noopener"><ion-icon name="logo-whatsapp" aria-hidden="true" />WhatsApp</a>
+                  </div>
+                </div>
+              }
+              @default { <p class="status"><ion-icon name="close-circle" aria-hidden="true" />Not available this time. Try another donor.</p> }
+            }
+          </article>
+        }
+      }
+    </section>
+  }
+  <p class="dl-note"><ion-icon name="information-circle-outline" aria-hidden="true" />Blood group alone does not confirm someone can safely donate. Confirm with the hospital or blood bank.</p>
+  <div class="dl-page-end"></div>
+</ion-content>

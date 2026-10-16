@@ -13,6 +13,13 @@ const MESSAGES: Record<string,string> = {
   'auth/user-disabled': 'This account is suspended. Contact support if you think this is a mistake.',
   'permission-denied': 'We couldn’t save your details. Check them and try again.',
   'unavailable': 'Can’t reach the server. Check your connection and try again.',
+  'functions/unavailable': 'Can’t reach the server. Check your connection and try again.',
+  'functions/permission-denied': 'Create an account and verify your email to contact donors.',
+  'functions/already-exists': 'You already have a request with this donor. Check Requests for their reply.',
+  'functions/resource-exhausted': 'You’ve sent several requests in the last hour. Try again later.',
+  'functions/not-found': 'This donor is no longer listed. Try another donor.',
+  'functions/failed-precondition': 'This request was already answered, or your profile is missing a mobile number.',
+  'functions/invalid-argument': 'Some details are missing. Check the form and try again.',
 };
 export function authErrorMessage(e: unknown): string {
   const code = typeof e === 'object' && e && 'code' in e ? String((e as { code: unknown }).code) : '';

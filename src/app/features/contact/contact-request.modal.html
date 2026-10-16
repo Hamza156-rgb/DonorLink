@@ -1,0 +1,48 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>{{ sent() ? 'Request sent' : 'Request contact' }}</ion-title>
+    <ion-buttons slot="end"><ion-button (click)="close()" aria-label="Close"><ion-icon slot="icon-only" name="close" /></ion-button></ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  @if (sent()) {
+    <div class="done">
+      <app-art class="dl-art-sm dl-float" kind="mail" />
+      <h2>Your request is with {{ donor.displayName }}</h2>
+      <p class="dl-sub">We’ve let them know. If they accept, their name and mobile number will appear under <strong>Requests → Sent</strong>, with buttons to call or WhatsApp.</p>
+      <p class="dl-info"><ion-icon name="information-circle-outline" />Donors are volunteers and may not reply quickly. In an emergency, contact several donors and the hospital blood bank.</p>
+      <ion-button appPress class="dl-cta" expand="block" (click)="viewRequests()">View my requests</ion-button>
+      <ion-button expand="block" fill="clear" class="dl-link" (click)="close()">Back to search</ion-button>
+    </div>
+  } @else {
+    <div class="who dl-card">
+      <div class="av">{{ donor.displayName.slice(0, 1) }}<span class="bg">{{ donor.bloodGroup }}</span></div>
+      <div><strong>{{ donor.displayName }}</strong><small><ion-icon name="location-outline" aria-hidden="true" />{{ donor.city }}, {{ donor.province }}</small></div>
+    </div>
+
+    @if (!net.online()) { <p class="dl-info"><ion-icon name="information-circle-outline" />You’re offline. Connect to the internet to send a request.</p> }
+
+    <form class="dl-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <ion-select label="Blood group needed" labelPlacement="stacked" fill="outline" interface="action-sheet" formControlName="bloodGroup">
+        @for (g of groups; track g) { <ion-select-option [value]="g">{{ g }}</ion-select-option> }
+      </ion-select>
+      <div>
+        <p class="lbl" id="urg">When is it needed?</p>
+        <ion-segment formControlName="urgency" aria-labelledby="urg">
+          @for (u of urgencies; track u) { <ion-segment-button [value]="u">{{ urgencyLabel[u] }}</ion-segment-button> }
+        </ion-segment>
+      </div>
+      <ion-input label="Hospital or blood bank" labelPlacement="stacked" fill="outline" formControlName="hospital"
+        placeholder="e.g. Mayo Hospital, Lahore" errorText="Enter the hospital or blood bank name.">
+        <ion-icon slot="start" name="medkit-outline" aria-hidden="true" />
+      </ion-input>
+      <ion-textarea label="Message (optional)" labelPlacement="stacked" fill="outline" formControlName="message" [autoGrow]="true" [counter]="true" maxlength="300"
+        placeholder="Patient’s situation, ward, or the best time to call" />
+      <p class="dl-info"><ion-icon name="lock-closed" />{{ donor.displayName }} will see your name, the hospital and your message. Their number is shared only if they accept.</p>
+      @if (error()) { <p class="dl-alert" role="alert"><ion-icon name="alert-circle" />{{ error() }}</p> }
+      <ion-button appPress class="dl-cta" type="submit" expand="block" [disabled]="busy() || !net.online()">
+        @if (busy()) { <ion-spinner name="crescent" aria-label="Sending" /> } @else { Send request }
+      </ion-button>
+    </form>
+  }
+</ion-content>

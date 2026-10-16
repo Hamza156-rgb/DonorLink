@@ -1,6 +1,5 @@
 .pick-title{margin:0 0 14px;font-size:1.1rem;font-weight:800}
-.filters{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-top:18px}
-.filters ion-select{--border-radius:var(--bd-r-sm);--border-color:var(--bd-line);--background:var(--bd-paper)}
+.filters{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;margin-top:18px}
 .filters ion-toggle{--track-background-checked:var(--bd-navy);font-weight:600;font-size:.9rem;min-height:var(--bd-tap)}
 .top-gap{margin-top:16px}
 .results{display:grid;gap:12px;padding:20px 16px 0}

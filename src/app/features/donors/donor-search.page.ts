@@ -2,24 +2,26 @@ import { Component, effect, inject, input, signal, untracked } from '@angular/co
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { IonButton, IonContent, IonIcon, IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonToggle, RefresherCustomEvent, AlertController, ToastController } from '@ionic/angular';
+import { IonButton, IonContent, IonIcon, IonRefresher, IonRefresherContent, IonToggle, RefresherCustomEvent, AlertController, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { alertCircle, cloudOfflineOutline, informationCircleOutline, locationOutline, refresh, shieldCheckmark } from 'ionicons/icons';
 import { DonorService } from './donor.service';
+import { ContactRequestComponent } from '../contact/contact-request.modal';
 import { AuthService } from '../../core/auth.service';
-import { BLOOD_GROUPS, BloodGroup, PK_CITIES, PublicDonor } from '../../core/models';
+import { BLOOD_GROUPS, BloodGroup, PublicDonor } from '../../core/models';
+import { CityPickerComponent } from '../../shared/city-picker.component';
 import { NetworkService } from '../../core/network.service';
 import { ArtComponent } from '../../shared/art.component';
 import { PressDirective } from '../../shared/press.directive';
 
-@Component({ selector:'app-donor-search', imports:[IonContent,IonRefresher,IonRefresherContent,IonSelect,IonSelectOption,IonToggle,IonButton,IonIcon,FormsModule,ArtComponent,PressDirective], templateUrl:'./donor-search.page.html', styleUrls:['./donor-search.page.scss'] })
+@Component({ selector:'app-donor-search', imports:[IonContent,IonRefresher,IonRefresherContent,CityPickerComponent,IonToggle,IonButton,IonIcon,FormsModule,ArtComponent,PressDirective], templateUrl:'./donor-search.page.html', styleUrls:['./donor-search.page.scss'] })
 export class DonorSearchPage {
-  private svc = inject(DonorService); private toast = inject(ToastController); private alert = inject(AlertController);
+  private svc = inject(DonorService); private modal = inject(ModalController); private alert = inject(AlertController);
   private auth = inject(AuthService); private router = inject(Router);
   readonly net = inject(NetworkService);
   /** ?group=O%2B from the home screen shortcuts. */
   readonly group = input<string>('');
-  groups = BLOOD_GROUPS; cities = Object.values(PK_CITIES).flat().sort();
+  groups = BLOOD_GROUPS;
   selected = signal<BloodGroup | null>(null); city = ''; availableOnly = true;
   items = signal<PublicDonor[]>([]); loading = signal(false); error = signal(''); searched = signal(false); more = signal(false);
   private cursor: QueryDocumentSnapshot | null = null;
@@ -29,11 +31,12 @@ export class DonorSearchPage {
     effect(() => {
       const g = this.group() as BloodGroup;
       if ((BLOOD_GROUPS as readonly string[]).includes(g)) untracked(() => { if (this.selected() !== g) this.pick(g); });
+      else untracked(() => { if (!this.searched() && !this.loading()) this.run(); });   // open with all donors listed
     });
   }
 
   async run(reset = true) {
-    const g = this.selected(); if (!g || this.loading()) return;
+    const g = this.selected() ?? undefined; if (this.loading()) return;
     if (reset) { this.cursor = null; this.items.set([]); }
     this.loading.set(true); this.error.set('');
     try {
@@ -43,14 +46,15 @@ export class DonorSearchPage {
     finally { this.loading.set(false); }
   }
   async refresh(e: Event) { await this.run(); (e as RefresherCustomEvent).target.complete(); }
-  pick(g: BloodGroup) { this.selected.set(g); this.run(); }
+  /** Tapping the selected group again clears it (all groups). */
+  pick(g: BloodGroup) { this.selected.set(this.selected() === g ? null : g); this.run(); }
   initials(name: string) { return name.trim().split(/\s+/).slice(0, 2).map(w => w[0]?.toUpperCase()).join(''); }
-  /** The contact workflow is the next module; say so plainly instead of a dead link. */
   async requestContact(d: PublicDonor) {
     if (this.auth.current?.isAnonymous) return this.askToSignUp(d);
-    const t = await this.toast.create({ message: `Contact requests are coming in the next update. ${d.displayName} hasn’t been notified.`, duration: 3000, position: 'top', color: 'secondary' });
-    await t.present();
+    const m = await this.modal.create({ component: ContactRequestComponent, componentProps: { donor: d, neededGroup: this.selected() }, initialBreakpoint: 1, breakpoints: [0, 1] });
+    await m.present();
   }
+  isMe(d: PublicDonor) { return d.uid === this.auth.current?.uid; }
   /** Contact needs a verified account (enforced in createContactRequest); explain why, then offer the way in. */
   private async askToSignUp(d: PublicDonor) {
     const a = await this.alert.create({

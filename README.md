@@ -12,6 +12,9 @@ Needs Node 20.19+ or 22.12+ (`nvm use` picks 22 from `.nvmrc`) and Java 21+ for 
 2. Terminal 1: `npm run emulators` (Auth 9099, Firestore 8080, Functions 5001, UI http://127.0.0.1:4000)
 3. Terminal 2: `ionic serve` (http://localhost:8100). Dev builds talk to the emulators (`src/environments/environment.ts`, project `demo-donorlink`).
 4. Register, then open the verification link printed in the emulator terminal (or Emulator UI > Authentication), then tap "I've verified my email".
+Test data: with emulators running, `npm run seed` (or `npm run dev` = emulators + seed + ionic serve). Local-only logins:
+`donor@donorlink.test` / `Donor@12345` (verified, listed donor), `seeker@donorlink.test` / `Seeker@12345` (verified),
+`newuser@donorlink.test` / `Newuser@12345` (unverified). Emulator data resets when the emulators stop; run the seed again.
 Checks: `ng lint`, `ng build`, `ng test --watch=false`, `npm run test:rules:ci`.
 If you change `angular.json` (styles, fonts, budgets), restart `ionic serve`; the dev server doesn't reload it.
 
@@ -28,6 +31,11 @@ If you change `angular.json` (styles, fonts, budgets), restart `ionic serve`; th
 - Account: email + password; a guest who signs up is upgraded in place (same uid).
 - Verified account: can list as a donor, post blood requests, and contact donors (`createContactRequest` refuses guests and unverified accounts).
 - Firebase console: enable Anonymous and Email/Password sign-in, and App Check before launch.
+
+## Contact workflow
+Seeker taps Contact → `createContactRequest` (hospital, urgency, message; 5/hour; one open request per donor) → donor sees it in Requests → Received →
+`respondToContactRequest`: Accept copies the donor's name + mobile into that one request (Call / WhatsApp appear under Requests → Sent); Decline shares nothing.
+Only the two parties can read a request; no client can write one directly.
 
 ## Design system
 Tokens: `src/theme/variables.scss` (brand navy/red from the logo). Shared UI: `src/theme/ui.scss` (`dl-` classes: hero, sheet, keycaps, raised CTA, alerts, skeletons).

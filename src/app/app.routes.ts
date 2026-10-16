@@ -15,6 +15,7 @@ export const routes: Routes = [
     children: [
       { path: 'home', loadComponent: () => import('./features/home/home.page').then((m) => m.HomePage) },
       { path: 'donors', loadComponent: () => import('./features/donors/donor-search.page').then((m) => m.DonorSearchPage) },
+      { path: 'requests', loadComponent: () => import('./features/requests/requests.page').then((m) => m.RequestsPage) },
       { path: 'account', loadComponent: () => import('./features/account/account.page').then((m) => m.AccountPage) },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],
