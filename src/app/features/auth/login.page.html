@@ -1,0 +1,26 @@
+<ion-content [fullscreen]="true">
+  <app-auth-hero heading="Welcome back" sub="Sign in to find donors and manage your requests." />
+  <main class="dl-sheet">
+    @if (!net.online()) { <p class="dl-info" role="status"><ion-icon name="cloud-offline-outline" />You’re offline. Connect to the internet to sign in.</p> }
+    <form class="dl-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <ion-input label="Email" labelPlacement="stacked" fill="outline" type="email" autocomplete="email" inputmode="email"
+        formControlName="email" errorText="Enter a valid email address, like name@example.com.">
+        <ion-icon slot="start" name="mail-outline" aria-hidden="true" />
+      </ion-input>
+      <ion-input label="Password" labelPlacement="stacked" fill="outline" type="password" autocomplete="current-password"
+        formControlName="password" errorText="Enter your password.">
+        <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true" />
+        <ion-input-password-toggle slot="end" />
+      </ion-input>
+      <div class="dl-row-end">
+        <ion-button fill="clear" class="dl-link" routerLink="/reset-password" [queryParams]="{ email: form.controls.email.value || null }">Forgot password?</ion-button>
+      </div>
+      @if (error()) { <p class="dl-alert" role="alert"><ion-icon name="alert-circle" />{{error()}}</p> }
+      <ion-button appPress class="dl-cta" type="submit" expand="block" [disabled]="busy() || !net.online()">
+        @if (busy()) { <ion-spinner name="crescent" aria-label="Signing in" /> } @else { Sign in }
+      </ion-button>
+    </form>
+  </main>
+  <p class="dl-switch">New to DonorLink? <ion-button fill="clear" class="dl-link" routerLink="/register">Create account</ion-button></p>
+  <div class="dl-page-end"></div>
+</ion-content>

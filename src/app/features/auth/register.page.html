@@ -1,0 +1,35 @@
+<ion-content [fullscreen]="true">
+  <app-auth-hero heading="Create your account" sub="Join donors and families across Pakistan. It takes a minute." back="/login" />
+  <main class="dl-sheet">
+    @if (!net.online()) { <p class="dl-info" role="status"><ion-icon name="cloud-offline-outline" />You’re offline. Connect to the internet to create an account.</p> }
+    <form class="dl-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <ion-input label="Full name" labelPlacement="stacked" fill="outline" autocomplete="name" formControlName="fullName"
+        errorText="Enter your name (2 to 80 characters).">
+        <ion-icon slot="start" name="person-outline" aria-hidden="true" />
+      </ion-input>
+      <ion-input label="Email" labelPlacement="stacked" fill="outline" type="email" autocomplete="email" inputmode="email"
+        formControlName="email" errorText="Enter a valid email address, like name@example.com.">
+        <ion-icon slot="start" name="mail-outline" aria-hidden="true" />
+      </ion-input>
+      <ion-input label="Mobile number" labelPlacement="stacked" fill="outline" type="tel" autocomplete="tel" inputmode="tel"
+        placeholder="0300 1234567" formControlName="phone" helperText="Pakistani mobile number" errorText="Enter a Pakistani mobile number, like 0300 1234567.">
+        <ion-icon slot="start" name="call-outline" aria-hidden="true" />
+      </ion-input>
+      <ion-select label="Preferred contact" labelPlacement="stacked" fill="outline" interface="action-sheet" formControlName="preferredContact">
+        @for (c of contacts; track c) { <ion-select-option [value]="c">{{contactLabel[c]}}</ion-select-option> }
+      </ion-select>
+      <ion-input label="Password" labelPlacement="stacked" fill="outline" type="password" autocomplete="new-password"
+        formControlName="password" helperText="At least 8 characters" errorText="Use a password with at least 8 characters.">
+        <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true" />
+        <ion-input-password-toggle slot="end" />
+      </ion-input>
+      <p class="dl-info"><ion-icon name="shield-checkmark" />Your phone and email are private. They’re never shown in donor search.</p>
+      @if (error()) { <p class="dl-alert" role="alert"><ion-icon name="alert-circle" />{{error()}}</p> }
+      <ion-button appPress class="dl-cta" type="submit" expand="block" [disabled]="busy() || !net.online()">
+        @if (busy()) { <ion-spinner name="crescent" aria-label="Creating account" /> } @else { Create account }
+      </ion-button>
+    </form>
+  </main>
+  <p class="dl-switch">Already have an account? <ion-button fill="clear" class="dl-link" routerLink="/login">Sign in</ion-button></p>
+  <div class="dl-page-end"></div>
+</ion-content>

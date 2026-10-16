@@ -1,0 +1,53 @@
+<ion-content [fullscreen]="true">
+  <header class="dl-hero">
+    <div class="dl-hero-top">
+      <span class="dl-brand"><span class="dl-logo-badge"><img src="assets/brand/logo-mark.png" alt="" width="32" height="31" /></span>DonorLink</span>
+      <a class="avatar" routerLink="/tabs/account" aria-label="Your account">{{ initials() }}</a>
+    </div>
+    <p class="hello">{{ greeting }},</p>
+    <h1>{{ firstName() }}</h1>
+    <p>Every drop connects a life.</p>
+  </header>
+
+  <section class="dl-sheet urgent" aria-labelledby="need-title">
+    <div class="urgent-text">
+      <h2 id="need-title">Need blood?</h2>
+      <p class="dl-sub">Find volunteer donors by blood group and city.</p>
+      <ion-button appPress class="dl-cta" routerLink="/tabs/donors">Find donors <ion-icon slot="end" name="arrow-forward" /></ion-button>
+    </div>
+    <app-art class="urgent-art dl-float" kind="search" />
+  </section>
+
+  <section class="dl-section" aria-labelledby="groups-title">
+    <h2 class="dl-section-title" id="groups-title">Search by blood group</h2>
+    <div class="dl-keys">
+      @for (g of groups; track g) {
+        <button class="dl-key" appPress type="button" [routerLink]="['/tabs/donors']" [queryParams]="{ group: g }" [attr.aria-label]="'Find ' + g + ' donors'">{{ g }}</button>
+      }
+    </div>
+  </section>
+
+  <section class="dl-section" aria-labelledby="how-title">
+    <h2 class="dl-section-title" id="how-title">How DonorLink works</h2>
+    <div class="steps">
+      @for (s of steps; track s.title; let i = $index) {
+        <article class="dl-card step">
+          <span class="step-ic"><ion-icon [name]="s.icon" aria-hidden="true" /></span>
+          <span class="step-n">Step {{ i + 1 }}</span>
+          <h3>{{ s.title }}</h3>
+          <p class="dl-sub">{{ s.body }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="dl-section">
+    <article class="privacy">
+      <span class="lock"><ion-icon name="lock-closed" aria-hidden="true" /></span>
+      <div><h3>Private by design</h3><p>Phone numbers and emails are never shown in search results.</p></div>
+    </article>
+  </section>
+
+  <p class="dl-note"><ion-icon name="information-circle-outline" aria-hidden="true" />Blood group alone does not confirm someone can safely donate. Confirm with the hospital or blood bank.</p>
+  <div class="dl-page-end"></div>
+</ion-content>

@@ -1,0 +1,16 @@
+.hello{margin:0 0 2px!important}
+.avatar{display:grid;place-items:center;width:var(--bd-tap);height:var(--bd-tap);border-radius:50%;background:var(--bd-card);color:var(--bd-navy);font-weight:800;text-decoration:none;box-shadow:0 8px 18px -6px rgba(0,0,0,.45)}
+.urgent{display:flex;align-items:center;gap:8px;overflow:hidden}
+.urgent h2{margin:0 0 4px;font-size:1.3rem;font-weight:800}
+.urgent ion-button{margin-top:14px}
+.urgent-text{flex:1;min-width:0}
+.urgent-art{width:112px;flex:none;margin-right:-8px}
+.steps{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:4px 16px 12px;scrollbar-width:none}
+.steps::-webkit-scrollbar{display:none}
+.step{flex:0 0 72%;max-width:260px;scroll-snap-align:start;padding:16px}
+.step h3{margin:8px 0 4px;font-size:1rem;font-weight:800}
+.step-ic{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--bd-navy-soft);color:var(--bd-navy);font-size:1.3rem;box-shadow:inset 0 -3px 0 rgba(var(--bd-navy-rgb),.12)}
+.step-n{display:block;margin-top:12px;color:var(--bd-muted);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.privacy{display:flex;gap:14px;align-items:center;padding:18px;border-radius:var(--bd-r-md);background:var(--bd-hero);color:var(--bd-on-brand);box-shadow:var(--bd-shadow-2)}
+.privacy h3{margin:0 0 2px;font-size:1rem;font-weight:800}.privacy p{margin:0;opacity:.85;font-size:.9rem;line-height:1.45}
+.lock{display:grid;place-items:center;flex:none;width:48px;height:48px;border-radius:16px;background:rgba(var(--bd-on-brand-rgb),.14);font-size:1.4rem}

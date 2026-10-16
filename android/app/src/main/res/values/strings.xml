@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DonorLink</string>
+    <string name="title_activity_main">DonorLink</string>
+    <string name="package_name">com.donorlink.app</string>
+    <string name="custom_url_scheme">com.donorlink.app</string>
+</resources>

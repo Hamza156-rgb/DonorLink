@@ -1,15 +1,38 @@
 # Pakistan Blood Donation App (core slice)
-Status: source written, NOT yet installed, built or tested.
+Status: Ionic shell, branded UI, onboarding, auth module, home/donor search/account tabs, Android project. `ng lint`, `ng build`, `ng test`, rules tests pass (2026-10-16).
 
 ## What is here
 - `firestore.rules`, `storage.rules`, `firestore.indexes.json`, `firebase.json`
 - `functions/`: setAdminRole, createContactRequest (rate-limited), setRequestStatus, expireRequests
 - `src/`: design tokens, models, donor search service + page (cursor pagination, privacy-safe public profile)
 
-## Setup
+## Run locally (no Firebase project needed)
+Needs Node 20.19+ or 22.12+ (`nvm use` picks 22 from `.nvmrc`) and Java 21+ for the emulators (`export JAVA_HOME=/usr/local/opt/openjdk@21` on this Mac).
+1. `npm install && npm --prefix tests install && npm --prefix functions install && npm --prefix functions run build`
+2. Terminal 1: `npm run emulators` (Auth 9099, Firestore 8080, Functions 5001, UI http://127.0.0.1:4000)
+3. Terminal 2: `ionic serve` (http://localhost:8100). Dev builds talk to the emulators (`src/environments/environment.ts`, project `demo-donorlink`).
+4. Register, then open the verification link printed in the emulator terminal (or Emulator UI > Authentication), then tap "I've verified my email".
+Checks: `ng lint`, `ng build`, `ng test --watch=false`, `npm run test:rules:ci`.
+If you change `angular.json` (styles, fonts, budgets), restart `ionic serve`; the dev server doesn't reload it.
+
+## Android
+- Package `com.donorlink.app` (set in `capacitor.config.ts`; permanent once published on Play).
+- Icons and splash come from `resources/` (made from the logo). Regenerate after changing them:
+  `npx capacitor-assets generate --android --assetPath resources --iconBackgroundColor '#FFFFFF' --splashBackgroundColor '#FFFFFF'`
+  Android 12+ uses `android/app/src/main/res/drawable-nodpi/splash_icon.png` on a white background (`values/styles.xml`).
+- Debug APK: `ionic build && npx cap sync android && (cd android && ./gradlew assembleDebug)` (needs Java 21 and `ANDROID_HOME=~/Library/Android/sdk`).
+- A phone can't reach emulators at 127.0.0.1; the device build needs the real Firebase project (next step).
+
+## Design system
+Tokens: `src/theme/variables.scss` (brand navy/red from the logo). Shared UI: `src/theme/ui.scss` (`dl-` classes: hero, sheet, keycaps, raised CTA, alerts, skeletons).
+`appPress` directive adds the pressed state and a light haptic on devices. Illustrations are inline SVG (`app-art`), font is bundled (no remote assets).
+
+Versions: Angular is pinned to 20.3 because the latest stable `@angular/fire` (20.1.1) supports Angular 20 only.
+
+## Setup (real Firebase project)
 1. `npm i -g @ionic/cli firebase-tools` (Node 20+)
-2. `ionic start bloodapp blank --type=angular --capacitor`, then copy this `src/` over its `src/`
-3. `ng add @angular/fire`, add your Firebase config to `src/environments/environment.ts` (never commit secrets)
+2. (Done: Ionic shell is scaffolded in this repo.)
+3. Put your web config in `src/environments/environment.prod.ts` (keep real values out of commits); enable Email/Password sign-in and email enumeration protection in the console
 4. `firebase login && firebase use <your-project-id>`
 5. `firebase deploy --only firestore,storage` and `cd functions && npm i && npm run build`
 6. First admin: in Firebase console create the user, then run once with a service account kept OUTSIDE the repo:
@@ -17,4 +40,4 @@ Status: source written, NOT yet installed, built or tested.
 7. `ionic serve`; Android: `ionic build && npx cap add android && npx cap open android`
 
 ## Not built yet
-Auth screens, profile, blood requests UI, contact inbox, notifications/FCM, admin dashboard, rules tests, other screens.
+Profile, blood requests UI, contact inbox, notifications/FCM, admin dashboard, rules tests, other screens.

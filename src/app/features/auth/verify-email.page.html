@@ -1,0 +1,24 @@
+<ion-content [fullscreen]="true">
+  <app-auth-hero heading="Verify your email" sub="One last step before you can search donors." />
+  <main class="dl-sheet dl-form">
+    @if (!net.online()) { <p class="dl-info" role="status"><ion-icon name="cloud-offline-outline" />You’re offline. Connect to the internet to continue.</p> }
+    <app-art class="dl-art-sm dl-float" kind="mail" />
+    @if (user(); as u) { <p class="dl-msg">We sent a verification link to <strong>{{u.email}}</strong>.</p> }
+    @else { <div class="dl-skel" style="height:22px" aria-hidden="true"></div> }
+    <ol class="dl-steps">
+      <li>Open the email from DonorLink</li>
+      <li>Tap the verification link</li>
+      <li>Come back here and continue</li>
+    </ol>
+    @if (error()) { <p class="dl-alert" role="alert"><ion-icon name="alert-circle" />{{error()}}</p> }
+    @if (info()) { <p class="dl-info" role="status"><ion-icon name="information-circle" />{{info()}}</p> }
+    <ion-button appPress class="dl-cta" expand="block" (click)="check()" [disabled]="checking() || !net.online()">
+      @if (checking()) { <ion-spinner name="crescent" aria-label="Checking" /> } @else { I’ve verified my email }
+    </ion-button>
+    <ion-button appPress expand="block" fill="outline" color="secondary" (click)="resend()" [disabled]="sending() || cooldown() > 0 || !net.online()">
+      {{ cooldown() ? 'Resend email in ' + cooldown() + 's' : 'Resend email' }}
+    </ion-button>
+  </main>
+  <p class="dl-switch">Can’t find it? Check spam, or <ion-button fill="clear" class="dl-link" (click)="signOut()">use a different account</ion-button></p>
+  <div class="dl-page-end"></div>
+</ion-content>

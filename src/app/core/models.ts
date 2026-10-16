@@ -6,3 +6,9 @@ export const PK_CITIES: Record<string,string[]> = {
  Punjab:['Lahore','Faisalabad','Rawalpindi','Multan','Gujranwala','Sialkot'], Sindh:['Karachi','Hyderabad','Sukkur'],
  'Khyber Pakhtunkhwa':['Peshawar','Abbottabad','Mardan'], Balochistan:['Quetta','Gwadar'], 'Islamabad Capital Territory':['Islamabad'],
  'Gilgit-Baltistan':['Gilgit'], 'Azad Kashmir':['Muzaffarabad']};
+
+export const PREFERRED_CONTACT = ['in_app','phone','whatsapp'] as const;
+export type PreferredContact = typeof PREFERRED_CONTACT[number];
+export const PREFERRED_CONTACT_LABEL: Record<PreferredContact,string> = { in_app:'In-app messages', phone:'Phone call', whatsapp:'WhatsApp' };
+/** Owner-only document at privateProfiles/{uid}. Never copied into publicDonorProfiles. */
+export interface PrivateProfile { fullName: string; email: string; phone: string; preferredContact: PreferredContact; }

@@ -1,0 +1,34 @@
+<ion-content [fullscreen]="true">
+  <header class="dl-hero center">
+    <div class="ring"><div class="avatar">{{ initials() }}</div></div>
+    <h1>{{ user()?.displayName || 'Your account' }}</h1>
+    @if (user()?.emailVerified) { <span class="dl-chip"><ion-icon name="shield-checkmark" aria-hidden="true" />Email verified</span> }
+  </header>
+
+  <section class="dl-sheet" aria-labelledby="details-title">
+    <h2 class="dl-section-title" id="details-title">Account details</h2>
+    @if (error()) {
+      <div class="dl-alert" role="alert"><ion-icon name="alert-circle" /><span>{{error()}}</span></div>
+      <ion-button fill="clear" class="dl-link" (click)="load(user()!.uid)">Try again</ion-button>
+    } @else {
+      <dl class="rows">
+        <div class="row"><dt><ion-icon name="person-outline" aria-hidden="true" />Full name</dt><dd>@if (loading()) {<span class="dl-skel sk"></span>} @else {{{ profile()?.fullName || user()?.displayName }}}</dd></div>
+        <div class="row"><dt><ion-icon name="mail-outline" aria-hidden="true" />Email</dt><dd>{{ user()?.email }}</dd></div>
+        <div class="row"><dt><ion-icon name="call-outline" aria-hidden="true" />Mobile</dt><dd>@if (loading()) {<span class="dl-skel sk"></span>} @else {{{ phoneDisplay() }}}</dd></div>
+        <div class="row"><dt><ion-icon name="chatbubbles-outline" aria-hidden="true" />Preferred contact</dt><dd>@if (loading()) {<span class="dl-skel sk"></span>} @else {{{ profile() ? contactLabel[profile()!.preferredContact] : 'Not set' }}}</dd></div>
+      </dl>
+      @if (user()?.metadata?.creationTime; as since) { <p class="since">Member since {{ since | date: 'MMMM y' }}</p> }
+    }
+  </section>
+
+  <section class="dl-section">
+    <p class="dl-info"><ion-icon name="information-circle-outline" />Only you can see these details. They’re never shown in donor search.</p>
+    <ion-button appPress expand="block" fill="outline" class="signout" (click)="signOut()"><ion-icon slot="start" name="log-out-outline" />Sign out</ion-button>
+  </section>
+
+  <footer class="foot">
+    <img src="assets/brand/logo-wordmark.png" alt="DonorLink" width="140" height="26" />
+    <p>Connecting donors. Saving lives.<br />Version {{ version }}</p>
+  </footer>
+  <div class="dl-page-end"></div>
+</ion-content>

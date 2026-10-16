@@ -1,0 +1,35 @@
+<ion-content [fullscreen]="true" [scrollY]="false">
+  <div class="screen">
+    <div class="top">
+      <span class="brand"><span class="dl-logo-badge"><img src="assets/brand/logo-mark.png" alt="" width="32" height="31" /></span>DonorLink</span>
+      @if (!last) { <button class="skip" type="button" (click)="go(slides.length - 1)">Skip</button> }
+    </div>
+
+    <div class="track" #track (scroll)="onScroll()" aria-roledescription="carousel">
+      @for (s of slides; track s.title; let i = $index) {
+        <section class="slide" [attr.aria-hidden]="i !== index()" aria-roledescription="slide" [attr.aria-label]="(i + 1) + ' of ' + slides.length">
+          <div class="orb">
+            @if (s.art === 'logo') { <img class="dl-float logo" src="assets/brand/logo-mark.png" alt="" width="180" height="175" /> }
+            @else { <app-art class="dl-float art" [kind]="s.art" /> }
+          </div>
+          <h1>{{ s.title }}</h1>
+          <p>{{ s.body }}</p>
+        </section>
+      }
+    </div>
+
+    <div class="bottom">
+      <div class="dots" role="tablist" aria-label="Slides">
+        @for (s of slides; track s.title; let i = $index) {
+          <button type="button" role="tab" class="dot" [class.on]="i === index()" [attr.aria-selected]="i === index()" [attr.aria-label]="'Go to slide ' + (i + 1)" (click)="go(i)"></button>
+        }
+      </div>
+      @if (last) {
+        <ion-button appPress class="dl-cta" expand="block" (click)="finish('/register')">Create account</ion-button>
+        <ion-button appPress class="dl-ghost" expand="block" fill="outline" (click)="finish('/login')">I already have an account</ion-button>
+      } @else {
+        <ion-button appPress class="dl-cta" expand="block" (click)="next()">Next</ion-button>
+      }
+    </div>
+  </div>
+</ion-content>

@@ -1,12 +1,31 @@
+// DonorLink design tokens. Brand colours are sampled from the logo (navy figure, red drop).
+// Rules: red = action/urgency only, green = "available" only, navy = brand surfaces.
 :root{
- --ion-font-family:"Inter","Segoe UI",Roboto,system-ui,sans-serif;
- --bd-ink:#161B22; --bd-muted:#5B6573; --bd-paper:#F4F6F8; --bd-card:#FFFFFF; --bd-line:#E1E5EA;
- --bd-red:#B3202A; --bd-red-soft:#FBE9EA; --bd-ok:#1D7A55; --bd-ok-soft:#E3F3EC;
- --ion-color-primary:var(--bd-red); --ion-color-primary-contrast:#fff;
+ --ion-font-family:"Plus Jakarta Sans Variable","Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+
+ --bd-navy:#0B417F; --bd-navy-deep:#06264D; --bd-navy-soft:#E8EFF8; --bd-navy-rgb:11,65,127;
+ --bd-red:#C8101B; --bd-red-bright:#EA2129; --bd-red-deep:#99070F; --bd-red-soft:#FDECED; --bd-red-rgb:200,16,27;
+ --bd-ok:#1D7A55; --bd-ok-soft:#E3F3EC;
+ --bd-ink:#0F1B2D; --bd-muted:#5B6678; --bd-paper:#F3F6FA; --bd-card:#FFFFFF; --bd-line:#E2E8F0;
+ --bd-on-brand:#FFFFFF; --bd-on-brand-rgb:255,255,255; --bd-focus:#1B5FD6;
+
+ // Depth scale (the "3D" layer): every raised surface uses one of these.
+ --bd-shadow-1:0 1px 2px rgba(var(--bd-navy-rgb),.06),0 3px 10px rgba(var(--bd-navy-rgb),.06);
+ --bd-shadow-2:0 2px 4px rgba(var(--bd-navy-rgb),.05),0 16px 32px -12px rgba(var(--bd-navy-rgb),.28);
+ --bd-shadow-3:0 24px 48px -16px rgba(var(--bd-navy-rgb),.45);
+ --bd-shadow-red:0 12px 24px -10px rgba(var(--bd-red-rgb),.65);
+ --bd-hero:radial-gradient(120% 80% at 90% -10%,rgba(var(--bd-on-brand-rgb),.16),transparent 60%),linear-gradient(165deg,var(--bd-navy) 0%,var(--bd-navy-deep) 100%);
+ --bd-cta:linear-gradient(180deg,var(--bd-red-bright) 0%,var(--bd-red) 100%);
+
+ --bd-r-sm:12px; --bd-r-md:18px; --bd-r-lg:26px; --bd-tap:48px;
+
+ --ion-color-primary:var(--bd-red); --ion-color-primary-rgb:200,16,27; --ion-color-primary-contrast:var(--bd-on-brand);
+ --ion-color-primary-contrast-rgb:255,255,255; --ion-color-primary-shade:#B00E18; --ion-color-primary-tint:#CE2832;
+ --ion-color-secondary:var(--bd-navy); --ion-color-secondary-rgb:11,65,127; --ion-color-secondary-contrast:var(--bd-on-brand);
+ --ion-color-secondary-contrast-rgb:255,255,255; --ion-color-secondary-shade:#0A3970; --ion-color-secondary-tint:#23548C;
  --ion-background-color:var(--bd-paper); --ion-text-color:var(--bd-ink);
- --bd-r-sm:10px; --bd-r-lg:20px; --bd-tap:48px;
 }
-h1,h2,h3{letter-spacing:-.01em;line-height:1.2}
-ion-button{--border-radius:var(--bd-r-sm);min-height:var(--bd-tap);font-weight:600;text-transform:none}
-:focus-visible{outline:3px solid #1B5FD6;outline-offset:2px}
+h1,h2,h3{letter-spacing:-.02em;line-height:1.2}
+ion-button{--border-radius:var(--bd-r-sm);min-height:var(--bd-tap);font-weight:700;text-transform:none;letter-spacing:0}
+:focus-visible{outline:3px solid var(--bd-focus);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

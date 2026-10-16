@@ -1,0 +1,112 @@
+// DonorLink shared UI. Global so every screen shares one look; pages keep only layout tweaks.
+
+// ---------- Brand hero (navy header that extends under the Android status bar)
+.dl-hero{
+  position:relative;overflow:hidden;color:var(--bd-on-brand);background:var(--bd-hero);
+  padding:calc(var(--ion-safe-area-top,0px) + 20px) 20px 64px;border-radius:0 0 32px 32px;
+  &::before,&::after{content:"";position:absolute;border-radius:50%;pointer-events:none;background:rgba(var(--bd-on-brand-rgb),.06)}
+  &::before{width:220px;height:220px;right:-70px;top:-60px}
+  &::after{width:140px;height:140px;left:-50px;bottom:-70px}
+  > *{position:relative;z-index:1}
+  h1{margin:0;font-size:1.65rem;font-weight:800}
+  p{margin:6px 0 0;opacity:.82;line-height:1.5}
+}
+.dl-hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:40px;margin-bottom:18px}
+.dl-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;letter-spacing:-.01em}
+.dl-icon-btn{
+  display:grid;place-items:center;width:var(--bd-tap);height:var(--bd-tap);margin:-4px;border:0;border-radius:50%;
+  background:rgba(var(--bd-on-brand-rgb),.12);color:var(--bd-on-brand);font-size:1.35rem;
+}
+
+// ---------- Logo badge: the mark on a raised white disc (its navy figure needs a light ground)
+.dl-logo-badge{
+  display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:50%;background:var(--bd-card);
+  box-shadow:0 8px 18px -6px rgba(0,0,0,.45),inset 0 -3px 0 rgba(var(--bd-navy-rgb),.08);
+  img{width:74%;height:auto}
+  &.lg{width:84px;height:84px;margin-bottom:16px}
+}
+
+// ---------- Surfaces
+.dl-sheet{position:relative;z-index:2;margin:-40px 16px 0;padding:20px;background:var(--bd-card);border-radius:var(--bd-r-lg);box-shadow:var(--bd-shadow-2)}
+.dl-card{background:var(--bd-card);border:1px solid var(--bd-line);border-radius:var(--bd-r-md);box-shadow:var(--bd-shadow-1)}
+.dl-section{padding:24px 16px 0}
+.dl-section-title{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 12px;font-size:1.05rem;font-weight:800}
+.dl-sub{margin:0;color:var(--bd-muted);font-size:.9rem;line-height:1.5}
+.dl-page-end{height:calc(var(--ion-safe-area-bottom,0px) + 24px)}
+
+// ---------- Tactile press (pairs with the appPress directive for haptics)
+.dl-press{transition:transform .14s cubic-bezier(.2,.8,.2,1),box-shadow .14s ease;-webkit-tap-highlight-color:transparent}
+.dl-press:active,.dl-press.is-pressed{transform:translateY(2px) scale(.985)}
+
+// ---------- Raised call-to-action button
+ion-button.dl-cta{--background:var(--bd-cta);--background-activated:var(--bd-red);--box-shadow:var(--bd-shadow-red),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.25);min-height:52px;font-size:1rem}
+ion-button.dl-ghost{--color:var(--bd-on-brand);--border-color:rgba(var(--bd-on-brand-rgb),.55);--background-activated:rgba(var(--bd-on-brand-rgb),.12)}
+ion-button.dl-link{--color:var(--bd-navy);font-weight:700}
+
+// ---------- Blood group keycaps: 3D keys that sink when pressed
+.dl-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.dl-key{
+  position:relative;min-height:58px;padding:0;border:1px solid var(--bd-line);border-radius:16px;
+  background:linear-gradient(180deg,var(--bd-card) 0%,var(--bd-paper) 100%);color:var(--bd-ink);
+  font:800 1.15rem var(--ion-font-family);box-shadow:0 4px 0 var(--bd-line),var(--bd-shadow-1);
+  transition:transform .12s ease,box-shadow .12s ease,background .2s ease;-webkit-tap-highlight-color:transparent;
+  &:active,&.is-pressed{transform:translateY(3px);box-shadow:0 1px 0 var(--bd-line)}
+  &.on{background:var(--bd-cta);color:var(--bd-on-brand);border-color:var(--bd-red-deep);box-shadow:0 4px 0 var(--bd-red-deep),var(--bd-shadow-red)}
+  &.on:active,&.on.is-pressed{box-shadow:0 1px 0 var(--bd-red-deep)}
+}
+
+// ---------- Forms
+.dl-form{display:grid;gap:14px}
+.dl-form ion-input,.dl-form ion-select{
+  --border-radius:var(--bd-r-sm);--border-color:var(--bd-line);--highlight-color-focused:var(--bd-navy);--background:var(--bd-paper);
+  min-height:var(--bd-tap);
+}
+.dl-form ion-input ion-icon[slot=start]{margin-inline-end:8px;color:var(--bd-muted);font-size:1.15rem}
+.dl-links{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px;margin-top:10px}
+
+// ---------- Status, messages, pills
+.dl-msg{margin:0;color:var(--bd-muted);line-height:1.5}
+.dl-msg.err{color:var(--bd-red)}
+.dl-alert{display:flex;gap:10px;align-items:flex-start;margin:0;padding:12px 14px;border-radius:var(--bd-r-sm);background:var(--bd-red-soft);color:var(--bd-red);line-height:1.45;font-weight:600}
+.dl-info{display:flex;gap:10px;align-items:flex-start;margin:0;padding:12px 14px;border-radius:var(--bd-r-sm);background:var(--bd-navy-soft);color:var(--bd-navy);line-height:1.45;font-weight:600}
+.dl-alert ion-icon,.dl-info ion-icon{flex:none;font-size:1.2rem;margin-top:1px}
+.dl-offline{margin:0 16px 12px;position:relative;z-index:3}
+.dl-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:var(--bd-paper);color:var(--bd-muted);font-size:.75rem;font-weight:700}
+.dl-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.7}
+.dl-pill.ok{background:var(--bd-ok-soft);color:var(--bd-ok)}
+.dl-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;background:rgba(var(--bd-on-brand-rgb),.14);color:var(--bd-on-brand);font-size:.8rem;font-weight:700}
+.dl-note{display:flex;gap:8px;margin:20px 16px 0;padding:12px 14px;border-radius:var(--bd-r-sm);background:var(--bd-card);border:1px dashed var(--bd-line);color:var(--bd-muted);font-size:.8rem;line-height:1.5}
+.dl-note ion-icon{flex:none;font-size:1rem;margin-top:1px}
+
+// ---------- Loading skeleton
+.dl-skel{background:linear-gradient(90deg,var(--bd-line) 0%,var(--bd-paper) 50%,var(--bd-line) 100%);background-size:200% 100%;animation:dl-shimmer 1.2s infinite linear;border-radius:var(--bd-r-sm)}
+@keyframes dl-shimmer{to{background-position:-200% 0}}
+
+// ---------- Floating illustration (depth via soft ground shadow + gentle bob)
+.dl-float{animation:dl-float 4.5s ease-in-out infinite}
+@keyframes dl-float{50%{transform:translateY(-8px)}}
+
+// ---------- Tabs: elevated bar with rounded top
+ion-tab-bar{
+  --background:var(--bd-card);--color:var(--bd-muted);--color-selected:var(--bd-navy);--border:0;
+  height:calc(64px + var(--ion-safe-area-bottom,0px));border-radius:22px 22px 0 0;box-shadow:0 -8px 24px -12px rgba(var(--bd-navy-rgb),.25);
+}
+ion-tab-button{font-weight:700;--padding-top:6px}
+ion-tab-button ion-label{font-size:.72rem}
+ion-tab-button.tab-selected ion-icon{transform:translateY(-1px)}
+
+// ---------- Status bar scrim: keeps scrolled content from showing under the status icons
+.dl-statusbar{position:fixed;inset:0 0 auto;height:var(--ion-safe-area-top,0px);background:var(--bd-navy-deep);z-index:1000;pointer-events:none}
+
+// ---------- Web boot splash (native splash is handled by @capacitor/splash-screen)
+#dl-boot{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;background:var(--bd-card);transition:opacity .35s ease}
+#dl-boot img{width:min(58vw,260px);height:auto}
+#dl-boot.gone{opacity:0;pointer-events:none}
+
+// ---------- Small layout helpers shared by auth screens
+.dl-row-end{display:flex;justify-content:flex-end;margin:-8px 0 -6px}
+.dl-switch{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;margin:18px 16px 0;color:var(--bd-muted);font-size:.92rem}
+.dl-art-sm{width:132px;margin:0 auto 8px}
+.dl-steps{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:10px;counter-reset:s}
+.dl-steps li{display:flex;gap:12px;align-items:center;line-height:1.4;counter-increment:s}
+.dl-steps li::before{content:counter(s);flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--bd-navy-soft);color:var(--bd-navy);font-weight:800;font-size:.85rem}

@@ -1,0 +1,5 @@
+{
+  "name": "DonorLink",
+  "integrations": { "capacitor": {} },
+  "type": "angular-standalone"
+}
