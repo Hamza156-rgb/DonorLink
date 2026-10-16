@@ -1,12 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonSelect, IonSelectOption, IonSpinner, IonTextarea, IonTitle, IonToolbar, ModalController } from '@ionic/angular';
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonSpinner, IonTextarea, IonTitle, IonToolbar, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { alertCircle, close, informationCircleOutline, locationOutline, lockClosed, medkitOutline } from 'ionicons/icons';
 import { authErrorMessage } from '../../core/auth-errors';
 import { ContactService } from '../../core/contact.service';
-import { BLOOD_GROUPS, BloodGroup, PublicDonor, URGENCY, URGENCY_LABEL, Urgency } from '../../core/models';
+import { BloodGroup, PublicDonor, URGENCY, URGENCY_LABEL, Urgency } from '../../core/models';
 import { NetworkService } from '../../core/network.service';
 import { ArtComponent } from '../../shared/art.component';
 import { PressDirective } from '../../shared/press.directive';
@@ -16,7 +16,7 @@ import { TiltDirective } from '../../shared/tilt.directive';
 /** Bottom sheet: seeker asks a donor to share their contact details. */
 @Component({
   selector: 'app-contact-request',
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonIcon, IonInput, IonTextarea, IonSelect, IonSelectOption, IonSpinner, ReactiveFormsModule, SegComponent, TiltDirective, ArtComponent, PressDirective],
+  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonIcon, IonInput, IonTextarea, IonSpinner, ReactiveFormsModule, SegComponent, TiltDirective, ArtComponent, PressDirective],
   templateUrl: './contact-request.modal.html',
   styleUrls: ['./contact-request.modal.scss'],
 })
@@ -26,8 +26,7 @@ export class ContactRequestComponent implements OnInit {
   readonly net = inject(NetworkService);
   // Set via ModalController componentProps, which Ionic assigns as plain properties (not signal inputs).
   donor!: PublicDonor;
-  neededGroup: BloodGroup | null = null;
-  groups = BLOOD_GROUPS; urgencies = URGENCY; urgencyLabel = URGENCY_LABEL;
+  urgencies = URGENCY; urgencyLabel = URGENCY_LABEL;
   urgencyOptions: SegOption[] = URGENCY.map(u => ({ value: u, label: URGENCY_LABEL[u] }));
   form = inject(FormBuilder).nonNullable.group({
     bloodGroup: ['O+' as BloodGroup, Validators.required],
@@ -38,7 +37,8 @@ export class ContactRequestComponent implements OnInit {
   busy = signal(false); error = signal(''); sent = signal(false);
 
   constructor() { addIcons({ alertCircle, close, informationCircleOutline, locationOutline, lockClosed, medkitOutline }); }
-  ngOnInit() { this.form.controls.bloodGroup.setValue(this.neededGroup ?? this.donor.bloodGroup); }
+  // The request is always for the donor's own group; the hospital confirms suitability.
+  ngOnInit() { this.form.controls.bloodGroup.setValue(this.donor.bloodGroup); }
 
   async submit() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }

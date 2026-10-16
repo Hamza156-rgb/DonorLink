@@ -153,7 +153,7 @@ ion-button.dl-link{--color:var(--bd-navy);font-weight:800}
 // ---------- Forms
 .dl-form{display:grid;gap:16px}
 .dl-form ion-input,.dl-form ion-select,.dl-form ion-textarea,ion-input.dl-field{
-  --border-radius:var(--bd-r-sm);--border-color:var(--bd-line-strong);--highlight-color-focused:var(--bd-navy);--background:var(--bd-card);
+  --border-radius:var(--bd-r-sm);--border-color:var(--bd-line-strong);--highlight-color-focused:var(--bd-navy);--highlight-color-valid:var(--bd-navy);--background:var(--bd-card);
   min-height:var(--bd-tap);
 }
 .dl-form ion-input ion-icon[slot=start]{margin-inline-end:8px;color:var(--bd-navy);opacity:.75;font-size:1.15rem}

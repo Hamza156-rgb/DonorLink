@@ -17,15 +17,13 @@
   } @else {
     <div class="who dl-card" appTilt>
       <div class="dl-av">{{ donor.displayName.slice(0, 1) }}<span class="dl-bg">{{ donor.bloodGroup }}</span></div>
-      <div><strong>{{ donor.displayName }}</strong><small><ion-icon name="location-outline" aria-hidden="true" />{{ donor.city }}, {{ donor.province }}</small></div>
+      <div><strong>{{ donor.displayName }}</strong><small><ion-icon name="location-outline" aria-hidden="true" />{{ donor.city }}, {{ donor.province }}</small>
+        <span class="for">Request for {{ donor.bloodGroup }} blood</span></div>
     </div>
 
     @if (!net.online()) { <p class="dl-info"><ion-icon name="information-circle-outline" />You’re offline. Connect to the internet to send a request.</p> }
 
     <form class="dl-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <ion-select label="Blood group needed" labelPlacement="stacked" fill="outline" interface="action-sheet" formControlName="bloodGroup">
-        @for (g of groups; track g) { <ion-select-option [value]="g">{{ g }}</ion-select-option> }
-      </ion-select>
       <div>
         <p class="lbl" id="urg">When is it needed?</p>
         <app-seg [options]="urgencyOptions" formControlName="urgency" aria-labelledby="urg" />

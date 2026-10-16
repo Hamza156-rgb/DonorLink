@@ -57,7 +57,7 @@ export class DonorSearchPage {
   async requestContact(d: PublicDonor) {
     if (!environment.features.contact) return this.contactUnavailable();
     if (this.auth.current?.isAnonymous) return this.askToSignUp(d);
-    const m = await this.modal.create({ component: ContactRequestComponent, componentProps: { donor: d, neededGroup: this.selected() }, initialBreakpoint: 1, breakpoints: [0, 1] });
+    const m = await this.modal.create({ component: ContactRequestComponent, componentProps: { donor: d }, initialBreakpoint: 1, breakpoints: [0, 1] });
     await m.present();
   }
   isMe(d: PublicDonor) { return d.uid === this.auth.current?.uid; }
