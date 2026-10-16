@@ -7,7 +7,7 @@
   </header>
 
   @if (guest()) {
-    <section class="dl-sheet guest">
+    <section class="dl-sheet guest" appTilt>
       <app-art class="dl-art-sm dl-float" kind="care" />
       <h2>Get more from DonorLink</h2>
       <ul class="perks">@for (p of perks; track p) { <li><ion-icon name="checkmark-circle" aria-hidden="true" />{{ p }}</li> }</ul>
@@ -25,11 +25,11 @@
       <div class="dl-alert" role="alert"><ion-icon name="alert-circle" /><span>{{error()}}</span></div>
       <ion-button fill="clear" class="dl-link" (click)="load(user()!.uid)">Try again</ion-button>
     } @else {
-      <dl class="rows">
-        <div class="row"><dt><ion-icon name="person-outline" aria-hidden="true" />Full name</dt><dd>@if (loading()) {<span class="dl-skel sk"></span>} @else {{{ profile()?.fullName || user()?.displayName }}}</dd></div>
-        <div class="row"><dt><ion-icon name="mail-outline" aria-hidden="true" />Email</dt><dd>{{ user()?.email }}</dd></div>
-        <div class="row"><dt><ion-icon name="call-outline" aria-hidden="true" />Mobile</dt><dd>@if (loading()) {<span class="dl-skel sk"></span>} @else {{{ phoneDisplay() }}}</dd></div>
-        <div class="row"><dt><ion-icon name="chatbubbles-outline" aria-hidden="true" />Preferred contact</dt><dd>@if (loading()) {<span class="dl-skel sk"></span>} @else {{{ profile() ? contactLabel[profile()!.preferredContact] : 'Not set' }}}</dd></div>
+      <dl class="rows dl-stagger">
+        <div class="row"><dt><span class="ri"><ion-icon name="person-outline" aria-hidden="true" /></span>Full name</dt><dd>@if (loading()) {<span class="dl-skel sk"></span>} @else {{{ profile()?.fullName || user()?.displayName }}}</dd></div>
+        <div class="row"><dt><span class="ri"><ion-icon name="mail-outline" aria-hidden="true" /></span>Email</dt><dd>{{ user()?.email }}</dd></div>
+        <div class="row"><dt><span class="ri"><ion-icon name="call-outline" aria-hidden="true" /></span>Mobile</dt><dd>@if (loading()) {<span class="dl-skel sk"></span>} @else {{{ phoneDisplay() }}}</dd></div>
+        <div class="row"><dt><span class="ri"><ion-icon name="chatbubbles-outline" aria-hidden="true" /></span>Preferred contact</dt><dd>@if (loading()) {<span class="dl-skel sk"></span>} @else {{{ profile() ? contactLabel[profile()!.preferredContact] : 'Not set' }}}</dd></div>
       </dl>
       @if (user()?.metadata?.creationTime; as since) { <p class="since">Member since {{ since | date: 'MMMM y' }}</p> }
     }
@@ -39,14 +39,14 @@
     <h2 class="dl-section-title" id="donor-title">Donor profile</h2>
     @if (donor() === undefined) { <div class="dl-card donor-card"><div class="dl-skel" style="height:54px;flex:1"></div></div> }
     @else if (donor(); as d) {
-      <a class="dl-card donor-card" appPress routerLink="/tabs/account/donor">
+      <a class="dl-card donor-card" appPress appTilt routerLink="/tabs/account/donor">
         <span class="drop">{{ d.bloodGroup }}</span>
         <span class="dtxt"><strong>{{ d.discoverable ? 'Listed as a donor' : 'Hidden from search' }}</strong>
           <small>{{ d.city }} · {{ availabilityLabel[d.availability] }}</small></span>
         <span class="edit">Edit<ion-icon name="chevron-forward" aria-hidden="true" /></span>
       </a>
     } @else {
-      <a class="dl-card donor-card become" appPress routerLink="/tabs/account/donor">
+      <a class="dl-card donor-card become" appPress appTilt routerLink="/tabs/account/donor">
         <span class="drop empty"><ion-icon name="heart" aria-hidden="true" /></span>
         <span class="dtxt"><strong>Become a donor</strong><small>Add your blood group and city so people nearby can find you.</small></span>
         <ion-icon class="go" name="chevron-forward" aria-hidden="true" />

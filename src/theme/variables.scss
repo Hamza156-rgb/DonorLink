@@ -3,21 +3,31 @@
 :root{
  --ion-font-family:"Plus Jakarta Sans Variable","Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 
- --bd-navy:#0B417F; --bd-navy-deep:#06264D; --bd-navy-soft:#E8EFF8; --bd-navy-rgb:11,65,127;
- --bd-red:#C8101B; --bd-red-bright:#EA2129; --bd-red-deep:#99070F; --bd-red-soft:#FDECED; --bd-red-rgb:200,16,27;
- --bd-ok:#1D7A55; --bd-ok-soft:#E3F3EC;
- --bd-ink:#0F1B2D; --bd-muted:#5B6678; --bd-paper:#F3F6FA; --bd-card:#FFFFFF; --bd-line:#E2E8F0;
- --bd-on-brand:#FFFFFF; --bd-on-brand-rgb:255,255,255; --bd-focus:#1B5FD6;
+ --bd-navy:#0B417F; --bd-navy-deep:#06264D; --bd-navy-ink:#041A36; --bd-navy-mid:#1B5AA6; --bd-navy-mid-rgb:27,90,166; --bd-navy-soft:#E8EFF8; --bd-navy-rgb:11,65,127;
+ --bd-red:#C8101B; --bd-red-bright:#EA2129; --bd-red-glow:#FF5A5F; --bd-red-deep:#99070F; --bd-red-soft:#FDECED; --bd-red-rgb:200,16,27;
+ --bd-ok:#1D7A55; --bd-ok-bright:#2FB57E; --bd-ok-soft:#E3F3EC; --bd-ok-rgb:29,122,85;
+ --bd-ink:#0F1B2D; --bd-muted:#5B6678; --bd-paper:#EEF2F8; --bd-card:#FFFFFF; --bd-line:#E2E8F0; --bd-line-strong:#CBD5E1;
+ --bd-on-brand:#FFFFFF; --bd-on-brand-rgb:255,255,255; --bd-focus:#1B5FD6; --bd-ink-rgb:15,27,45;
 
  // Depth scale (the "3D" layer): every raised surface uses one of these.
- --bd-shadow-1:0 1px 2px rgba(var(--bd-navy-rgb),.06),0 3px 10px rgba(var(--bd-navy-rgb),.06);
- --bd-shadow-2:0 2px 4px rgba(var(--bd-navy-rgb),.05),0 16px 32px -12px rgba(var(--bd-navy-rgb),.28);
- --bd-shadow-3:0 24px 48px -16px rgba(var(--bd-navy-rgb),.45);
- --bd-shadow-red:0 12px 24px -10px rgba(var(--bd-red-rgb),.65);
- --bd-hero:radial-gradient(120% 80% at 90% -10%,rgba(var(--bd-on-brand-rgb),.16),transparent 60%),linear-gradient(165deg,var(--bd-navy) 0%,var(--bd-navy-deep) 100%);
- --bd-cta:linear-gradient(180deg,var(--bd-red-bright) 0%,var(--bd-red) 100%);
+ --bd-shadow-1:0 1px 2px rgba(var(--bd-navy-rgb),.06),0 6px 16px -6px rgba(var(--bd-navy-rgb),.14);
+ --bd-shadow-2:0 2px 6px rgba(var(--bd-navy-rgb),.06),0 22px 44px -18px rgba(var(--bd-navy-rgb),.38);
+ --bd-shadow-3:0 30px 60px -20px rgba(var(--bd-navy-rgb),.5);
+ --bd-shadow-red:0 14px 26px -10px rgba(var(--bd-red-rgb),.7);
+ --bd-rim:inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.9),inset 0 -2px 0 rgba(var(--bd-navy-rgb),.05);
+ --bd-hero:
+   radial-gradient(60% 55% at 100% 0%,rgba(var(--bd-red-rgb),.42),transparent 70%),
+   radial-gradient(70% 60% at 0% 100%,rgba(var(--bd-navy-mid-rgb),.65),transparent 70%),
+   radial-gradient(120% 80% at 80% -10%,rgba(var(--bd-on-brand-rgb),.14),transparent 60%),
+   linear-gradient(160deg,var(--bd-navy) 0%,var(--bd-navy-deep) 55%,var(--bd-navy-ink) 100%);
+ --bd-cta:linear-gradient(180deg,var(--bd-red-glow) -30%,var(--bd-red-bright) 25%,var(--bd-red) 75%,var(--bd-red-deep) 130%);
+ --bd-navy-btn:linear-gradient(180deg,var(--bd-navy-mid) 0%,var(--bd-navy) 60%,var(--bd-navy-deep) 100%);
+ --bd-glass:rgba(var(--bd-on-brand-rgb),.12); --bd-glass-line:rgba(var(--bd-on-brand-rgb),.22);
+ --bd-sheen:linear-gradient(180deg,rgba(var(--bd-on-brand-rgb),.35),rgba(var(--bd-on-brand-rgb),0) 55%);
+ --bd-page:radial-gradient(90% 40% at 50% 0%,rgba(var(--bd-navy-rgb),.08),transparent 70%),var(--bd-paper);
 
- --bd-r-sm:12px; --bd-r-md:18px; --bd-r-lg:26px; --bd-tap:48px;
+ --bd-r-sm:14px; --bd-r-md:20px; --bd-r-lg:28px; --bd-tap:48px;
+ --bd-ease:cubic-bezier(.2,.8,.2,1); --bd-spring:cubic-bezier(.34,1.56,.64,1);
 
  --ion-color-primary:var(--bd-red); --ion-color-primary-rgb:200,16,27; --ion-color-primary-contrast:var(--bd-on-brand);
  --ion-color-primary-contrast-rgb:255,255,255; --ion-color-primary-shade:#B00E18; --ion-color-primary-tint:#CE2832;
@@ -25,7 +35,7 @@
  --ion-color-secondary-contrast-rgb:255,255,255; --ion-color-secondary-shade:#0A3970; --ion-color-secondary-tint:#23548C;
  --ion-background-color:var(--bd-paper); --ion-text-color:var(--bd-ink);
 }
-h1,h2,h3{letter-spacing:-.02em;line-height:1.2}
+h1,h2,h3{letter-spacing:-.025em;line-height:1.2}
 ion-button{--border-radius:var(--bd-r-sm);min-height:var(--bd-tap);font-weight:700;text-transform:none;letter-spacing:0}
 :focus-visible{outline:3px solid var(--bd-focus);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

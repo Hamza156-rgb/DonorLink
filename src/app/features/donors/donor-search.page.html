@@ -7,12 +7,14 @@
   </header>
 
   <section class="dl-sheet" aria-labelledby="pick-title">
+    <span class="step-lbl">Step 1</span>
     <h2 class="pick-title" id="pick-title">Which blood group do you need?</h2>
     <div class="dl-keys" role="radiogroup" aria-labelledby="pick-title">
       @for (g of groups; track g) {
         <button class="dl-key" appPress type="button" role="radio" [attr.aria-checked]="selected()===g" [class.on]="selected()===g" (click)="pick(g)">{{g}}</button>
       }
     </div>
+    <span class="step-lbl gap">Step 2 · Narrow it down</span>
     <div class="filters">
       <app-city-picker [(value)]="city" (picked)="run()" />
       <ion-toggle [(ngModel)]="availableOnly" (ionChange)="run()" labelPlacement="start">Available now</ion-toggle>
@@ -21,7 +23,7 @@
 
   @if (!net.online()) { <p class="dl-info dl-offline top-gap" role="status"><ion-icon name="cloud-offline-outline" />You’re offline. Results may be out of date.</p> }
 
-  <section class="results" aria-live="polite">
+  <section class="results dl-stagger" aria-live="polite">
     @if (error()) {
       <div class="dl-alert" role="alert"><ion-icon name="alert-circle" /><span>{{error()}}</span>
         <ion-button size="small" fill="clear" (click)="run()"><ion-icon slot="start" name="refresh" />Retry</ion-button></div>
@@ -31,8 +33,8 @@
         @if (selected()) { for <strong>{{selected()}}</strong> } @else { · <strong>all blood groups</strong> }{{ city ? ' in ' + city : '' }}</p>
     }
       @for (d of items(); track d.uid) {
-        <article class="dl-card donor">
-          <div class="avatar" aria-hidden="true">{{ initials(d.displayName) }}<span class="bg">{{d.bloodGroup}}</span></div>
+        <article class="dl-card donor" appTilt>
+          <div class="dl-av" aria-hidden="true">{{ initials(d.displayName) }}<span class="dl-bg">{{d.bloodGroup}}</span></div>
           <div class="info">
             <h3>{{d.displayName}} @if (d.verified) {<ion-icon class="ver" name="shield-checkmark" aria-label="Verified donor" />}</h3>
             <p><ion-icon name="location-outline" aria-hidden="true" />{{d.city}}, {{d.province}}</p>
@@ -44,7 +46,7 @@
       }
       @if (loading()) { @for (i of [1,2,3]; track i) { <div class="dl-card donor skel-card" aria-hidden="true"><div class="dl-skel sk-av"></div><div class="sk-lines"><div class="dl-skel"></div><div class="dl-skel"></div></div></div> } }
     @if (searched() && !loading() && !items().length && !error()) {
-      <div class="state"><app-art class="state-art" kind="empty" /><h3>No {{ selected() ? selected() + ' ' : '' }}donors {{ city ? 'in ' + city : 'listed' }} yet</h3>
+      <div class="dl-state"><app-art kind="empty" /><h3>No {{ selected() ? selected() + ' ' : '' }}donors {{ city ? 'in ' + city : 'listed' }} yet</h3>
         <p class="dl-sub">Try all cities, another blood group, or turn off “Available now”. More donors join every day.</p></div>
     }
     @if (more() && !loading()) { <ion-button appPress expand="block" fill="outline" color="secondary" class="more" (click)="run(false)">Load more donors</ion-button> }

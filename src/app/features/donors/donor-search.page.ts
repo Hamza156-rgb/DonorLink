@@ -14,8 +14,9 @@ import { CityPickerComponent } from '../../shared/city-picker.component';
 import { NetworkService } from '../../core/network.service';
 import { ArtComponent } from '../../shared/art.component';
 import { PressDirective } from '../../shared/press.directive';
+import { TiltDirective } from '../../shared/tilt.directive';
 
-@Component({ selector:'app-donor-search', imports:[IonContent,IonRefresher,IonRefresherContent,CityPickerComponent,IonToggle,IonButton,IonIcon,FormsModule,ArtComponent,PressDirective], templateUrl:'./donor-search.page.html', styleUrls:['./donor-search.page.scss'] })
+@Component({ selector:'app-donor-search', imports:[IonContent,IonRefresher,IonRefresherContent,CityPickerComponent,IonToggle,IonButton,IonIcon,FormsModule,ArtComponent,PressDirective,TiltDirective], templateUrl:'./donor-search.page.html', styleUrls:['./donor-search.page.scss'] })
 export class DonorSearchPage {
   private svc = inject(DonorService); private modal = inject(ModalController); private alert = inject(AlertController);
   private auth = inject(AuthService); private router = inject(Router);

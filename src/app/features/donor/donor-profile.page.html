@@ -13,8 +13,8 @@
   } @else {
     <section class="dl-sheet">
       <p class="lbl">How you’ll appear in search</p>
-      <article class="preview dl-card" aria-label="Preview of your listing">
-        <div class="av">{{ initials() }}@if (bloodGroup()) {<span class="bg">{{ bloodGroup() }}</span>}</div>
+      <article class="preview dl-card" appTilt aria-label="Preview of your listing">
+        <div class="dl-av">{{ initials() }}@if (bloodGroup()) {<span class="dl-bg">{{ bloodGroup() }}</span>}</div>
         <div class="info">
           <strong>{{ displayName.trim() || 'Your name' }}</strong>
           <small><ion-icon name="location-outline" aria-hidden="true" />{{ city ? city + ', ' + province() : 'Choose your city' }}</small>
@@ -41,12 +41,10 @@
       @if (touched() && !city) { <p class="field-err">Choose your city.</p> }
 
       <h2 class="dl-section-title top">Availability</h2>
-      <ion-segment [(ngModel)]="availability" aria-label="Availability">
-        @for (a of availabilities; track a) { <ion-segment-button [value]="a">{{ availabilityLabel[a] }}</ion-segment-button> }
-      </ion-segment>
+      <app-seg [options]="availabilityOptions" [(ngModel)]="availability" aria-label="Availability" />
 
       <h2 class="dl-section-title top">Name shown in search</h2>
-      <ion-input class="name" fill="outline" [(ngModel)]="displayName" maxlength="40" aria-label="Name shown in search"
+      <ion-input class="dl-field" fill="outline" [(ngModel)]="displayName" maxlength="40" aria-label="Name shown in search"
         helperText="First name and last initial keeps you hard to identify." [errorText]="nameError" [class.ion-invalid]="touched() && !!nameError" [class.ion-touched]="touched()" />
 
       <div class="dl-card toggle-row">

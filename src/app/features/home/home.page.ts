@@ -10,8 +10,9 @@ import { AVAILABILITY_LABEL } from '../../core/models';
 import { BLOOD_GROUPS } from '../../core/models';
 import { ArtComponent } from '../../shared/art.component';
 import { PressDirective } from '../../shared/press.directive';
+import { TiltDirective } from '../../shared/tilt.directive';
 
-@Component({ selector:'app-home', imports:[IonContent,IonButton,IonIcon,IonRouterLink,RouterLink,ArtComponent,PressDirective], templateUrl:'./home.page.html', styleUrls:['./home.page.scss'] })
+@Component({ selector:'app-home', imports:[IonContent,IonButton,IonIcon,IonRouterLink,RouterLink,ArtComponent,PressDirective,TiltDirective], templateUrl:'./home.page.html', styleUrls:['./home.page.scss'] })
 export class HomePage {
   private user = toSignal(inject(AuthService).user$);
   groups = BLOOD_GROUPS; availabilityLabel = AVAILABILITY_LABEL;

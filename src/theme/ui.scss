@@ -1,82 +1,186 @@
 // DonorLink shared UI. Global so every screen shares one look; pages keep only layout tweaks.
+// Depth model: hero (deepest, navy mesh) → sheet (lifted white, overlaps hero) → cards → 3D buttons/keys (have an edge).
 
-// ---------- Brand hero (navy header that extends under the Android status bar)
+ion-content{--background:var(--bd-page)}
+
+// ---------- Brand hero (navy mesh header that extends under the Android status bar)
 .dl-hero{
   position:relative;overflow:hidden;color:var(--bd-on-brand);background:var(--bd-hero);
-  padding:calc(var(--ion-safe-area-top,0px) + 20px) 20px 64px;border-radius:0 0 32px 32px;
-  &::before,&::after{content:"";position:absolute;border-radius:50%;pointer-events:none;background:rgba(var(--bd-on-brand-rgb),.06)}
-  &::before{width:220px;height:220px;right:-70px;top:-60px}
-  &::after{width:140px;height:140px;left:-50px;bottom:-70px}
-  > *{position:relative;z-index:1}
-  h1{margin:0;font-size:1.65rem;font-weight:800}
-  p{margin:6px 0 0;opacity:.82;line-height:1.5}
+  padding:calc(var(--ion-safe-area-top,0px) + 20px) 20px 68px;border-radius:0 0 36px 36px;
+  box-shadow:inset 0 -1px 0 var(--bd-glass-line);
+  // Glossy 3D blood drop (right) and a glass bubble (left), drifting slowly behind the text.
+  &::before,&::after{content:"";position:absolute;pointer-events:none;z-index:0}
+  &::before{
+    width:92px;height:92px;right:-14px;top:calc(var(--ion-safe-area-top,0px) + 58%);border-radius:50% 0 50% 50%;opacity:.9;
+    background:radial-gradient(circle at 30% 30%,rgba(var(--bd-on-brand-rgb),.85) 0 6%,var(--bd-red-glow) 14%,var(--bd-red-bright) 34%,var(--bd-red) 62%,var(--bd-red-deep) 100%);
+    box-shadow:inset -10px -12px 20px rgba(var(--bd-ink-rgb),.35),0 24px 40px -12px rgba(var(--bd-ink-rgb),.6);
+    animation:dl-drop 7s ease-in-out infinite;
+  }
+  &::after{
+    width:150px;height:150px;left:-56px;bottom:-62px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,rgba(var(--bd-on-brand-rgb),.28),rgba(var(--bd-on-brand-rgb),.04) 60%);
+    border:1px solid var(--bd-glass-line);animation:dl-bob 9s ease-in-out infinite;
+  }
+  > *{position:relative;z-index:1;animation:dl-rise .55s var(--bd-ease) backwards}
+  > :nth-child(2){animation-delay:.05s} > :nth-child(3){animation-delay:.1s} > :nth-child(n+4){animation-delay:.15s}
+  h1{margin:0;font-size:1.75rem;font-weight:800;text-shadow:0 2px 12px rgba(var(--bd-ink-rgb),.35)}
+  p{margin:6px 0 0;opacity:.84;line-height:1.5;max-width:30ch}
 }
+@keyframes dl-drop{0%,100%{transform:rotate(-45deg) translate(0,0)}50%{transform:rotate(-38deg) translate(-4px,-10px)}}
+@keyframes dl-bob{50%{transform:translateY(-10px) scale(1.04)}}
 .dl-hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:40px;margin-bottom:18px}
 .dl-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;letter-spacing:-.01em}
 .dl-icon-btn{
-  display:grid;place-items:center;width:var(--bd-tap);height:var(--bd-tap);margin:-4px;border:0;border-radius:50%;
-  background:rgba(var(--bd-on-brand-rgb),.12);color:var(--bd-on-brand);font-size:1.35rem;
+  display:grid;place-items:center;width:var(--bd-tap);height:var(--bd-tap);margin:-4px;border:1px solid var(--bd-glass-line);border-radius:16px;
+  background:var(--bd-glass);color:var(--bd-on-brand);font-size:1.35rem;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
 }
+.dl-eyebrow{display:inline-flex;align-items:center;gap:6px;margin:0 0 6px;padding:5px 10px;border-radius:99px;background:var(--bd-glass);border:1px solid var(--bd-glass-line);font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
 
 // ---------- Logo badge: the mark on a raised white disc (its navy figure needs a light ground)
 .dl-logo-badge{
   display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:50%;background:var(--bd-card);
-  box-shadow:0 8px 18px -6px rgba(0,0,0,.45),inset 0 -3px 0 rgba(var(--bd-navy-rgb),.08);
+  box-shadow:0 10px 20px -6px rgba(var(--bd-ink-rgb),.55),inset 0 -3px 0 rgba(var(--bd-navy-rgb),.1),0 0 0 4px var(--bd-glass);
   img{width:74%;height:auto}
-  &.lg{width:84px;height:84px;margin-bottom:16px}
+  &.lg{width:84px;height:84px;margin-bottom:16px;box-shadow:0 18px 34px -10px rgba(var(--bd-ink-rgb),.6),inset 0 -4px 0 rgba(var(--bd-navy-rgb),.1),0 0 0 8px var(--bd-glass)}
 }
 
 // ---------- Surfaces
-.dl-sheet{position:relative;z-index:2;margin:-40px 16px 0;padding:20px;background:var(--bd-card);border-radius:var(--bd-r-lg);box-shadow:var(--bd-shadow-2)}
-.dl-card{background:var(--bd-card);border:1px solid var(--bd-line);border-radius:var(--bd-r-md);box-shadow:var(--bd-shadow-1)}
-.dl-section{padding:24px 16px 0}
-.dl-section-title{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 12px;font-size:1.05rem;font-weight:800}
+.dl-sheet{
+  position:relative;z-index:2;margin:-44px 16px 0;padding:20px;background:var(--bd-card);border-radius:var(--bd-r-lg);
+  box-shadow:var(--bd-shadow-2),var(--bd-rim);animation:dl-rise .5s .08s var(--bd-ease) backwards;
+}
+.dl-card{position:relative;background:var(--bd-card);border:1px solid rgba(var(--bd-navy-rgb),.07);border-radius:var(--bd-r-md);box-shadow:var(--bd-shadow-1),var(--bd-rim)}
+.dl-section{padding:26px 16px 0;animation:dl-rise .5s .14s var(--bd-ease) backwards}
+.dl-section + .dl-section{animation-delay:.2s}
+.dl-section-title{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:1.08rem;font-weight:800}
+.dl-section-title::before{content:"";width:4px;height:18px;border-radius:4px;background:var(--bd-navy-btn)}
 .dl-sub{margin:0;color:var(--bd-muted);font-size:.9rem;line-height:1.5}
-.dl-page-end{height:calc(var(--ion-safe-area-bottom,0px) + 24px)}
+.dl-page-end{height:calc(var(--ion-safe-area-bottom,0px) + 28px)}
+// Tab screens scroll under the floating tab bar, so their last item needs to clear it.
+ion-tabs .dl-page-end{height:calc(var(--ion-safe-area-bottom,0px) + 104px)}
+
+// Lists: children rise in one after another.
+.dl-stagger > *{animation:dl-rise .45s var(--bd-ease) backwards}
+@for $i from 1 through 8 { .dl-stagger > :nth-child(#{$i}){animation-delay:#{.04 + $i * .05}s} }
+@keyframes dl-rise{from{opacity:0;transform:translateY(14px)}}
 
 // ---------- Tactile press (pairs with the appPress directive for haptics)
-.dl-press{transition:transform .14s cubic-bezier(.2,.8,.2,1),box-shadow .14s ease;-webkit-tap-highlight-color:transparent}
+.dl-press{transition:transform .16s var(--bd-ease),box-shadow .16s ease;-webkit-tap-highlight-color:transparent}
 .dl-press:active,.dl-press.is-pressed{transform:translateY(2px) scale(.985)}
 
-// ---------- Raised call-to-action button
-ion-button.dl-cta{--background:var(--bd-cta);--background-activated:var(--bd-red);--box-shadow:var(--bd-shadow-red),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.25);min-height:52px;font-size:1rem}
-ion-button.dl-ghost{--color:var(--bd-on-brand);--border-color:rgba(var(--bd-on-brand-rgb),.55);--background-activated:rgba(var(--bd-on-brand-rgb),.12)}
-ion-button.dl-link{--color:var(--bd-navy);font-weight:700}
-
-// ---------- Blood group keycaps: 3D keys that sink when pressed
-.dl-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.dl-key{
-  position:relative;min-height:58px;padding:0;border:1px solid var(--bd-line);border-radius:16px;
-  background:linear-gradient(180deg,var(--bd-card) 0%,var(--bd-paper) 100%);color:var(--bd-ink);
-  font:800 1.15rem var(--ion-font-family);box-shadow:0 4px 0 var(--bd-line),var(--bd-shadow-1);
-  transition:transform .12s ease,box-shadow .12s ease,background .2s ease;-webkit-tap-highlight-color:transparent;
-  &:active,&.is-pressed{transform:translateY(3px);box-shadow:0 1px 0 var(--bd-line)}
-  &.on{background:var(--bd-cta);color:var(--bd-on-brand);border-color:var(--bd-red-deep);box-shadow:0 4px 0 var(--bd-red-deep),var(--bd-shadow-red)}
-  &.on:active,&.on.is-pressed{box-shadow:0 1px 0 var(--bd-red-deep)}
+// ---------- 3D tilt (pairs with the appTilt directive): leans toward the finger, glare follows it
+.dl-tilt{
+  transition:transform .45s var(--bd-spring),box-shadow .3s ease;-webkit-tap-highlight-color:transparent;
+  &::after{
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s ease;
+    background:radial-gradient(circle at var(--gx,50%) var(--gy,0%),rgba(var(--bd-on-brand-rgb),.55),transparent 55%);mix-blend-mode:soft-light;
+  }
+  // The 3D transform exists only while touched: a permanent 3D layer escapes the scroll clip in Android WebView.
+  &.is-tilting{
+    transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(.99);
+    transition:transform .08s linear,box-shadow .3s ease;box-shadow:var(--bd-shadow-3),var(--bd-rim);
+  }
+  &.is-tilting::after{opacity:1}
 }
+
+// ---------- 3D buttons: gradient body, top sheen, solid bottom edge that sinks when pressed
+ion-button.dl-cta{
+  --background:var(--bd-cta);--background-activated:var(--bd-red);--background-focused:var(--bd-red);--border-radius:16px;
+  --box-shadow:0 4px 0 var(--bd-red-deep),var(--bd-shadow-red),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.4);
+  min-height:54px;font-size:1rem;font-weight:800;margin-bottom:4px;
+  &.is-pressed,&:active{transform:translateY(3px);--box-shadow:0 1px 0 var(--bd-red-deep),0 6px 12px -8px rgba(var(--bd-red-rgb),.7),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.3)}
+  &[disabled]{--box-shadow:none;opacity:.55}
+}
+ion-button.dl-navy{
+  --background:var(--bd-navy-btn);--background-activated:var(--bd-navy-deep);--color:var(--bd-on-brand);--border-radius:16px;
+  --box-shadow:0 4px 0 var(--bd-navy-ink),var(--bd-shadow-2),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.3);min-height:52px;font-weight:800;margin-bottom:4px;
+  &.is-pressed,&:active{transform:translateY(3px);--box-shadow:0 1px 0 var(--bd-navy-ink),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.25)}
+}
+ion-button[fill=outline]:not(.signout){
+  --background:var(--bd-card);--border-width:1px;--border-color:var(--bd-line-strong);--border-radius:16px;--color:var(--bd-navy);
+  --box-shadow:0 3px 0 var(--bd-line-strong),var(--bd-shadow-1);font-weight:800;margin-bottom:3px;
+  &.is-pressed,&:active{transform:translateY(2px);--box-shadow:0 1px 0 var(--bd-line-strong)}
+}
+ion-button.dl-ghost{--color:var(--bd-on-brand);--border-color:rgba(var(--bd-on-brand-rgb),.55);--background-activated:rgba(var(--bd-on-brand-rgb),.12)}
+ion-button.dl-link{--color:var(--bd-navy);font-weight:800}
+
+// ---------- Blood group keycaps: 3D keys with a visible edge that sink when pressed
+.dl-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.dl-key{
+  position:relative;min-height:60px;padding:0;border:1px solid var(--bd-line);border-radius:18px;
+  background:linear-gradient(180deg,var(--bd-card) 0%,var(--bd-card) 45%,var(--bd-paper) 100%);color:var(--bd-ink);
+  font:800 1.15rem var(--ion-font-family);letter-spacing:-.01em;
+  box-shadow:0 5px 0 var(--bd-line-strong),0 12px 18px -10px rgba(var(--bd-navy-rgb),.35),inset 0 1px 0 var(--bd-card);
+  transition:transform .12s ease,box-shadow .12s ease,background .2s ease,color .2s ease;-webkit-tap-highlight-color:transparent;
+  &::before{content:"";position:absolute;inset:3px 6px auto;height:40%;border-radius:14px 14px 30px 30px;background:var(--bd-sheen);pointer-events:none;opacity:.7}
+  &:active,&.is-pressed{transform:translateY(4px);box-shadow:0 1px 0 var(--bd-line-strong),0 4px 8px -6px rgba(var(--bd-navy-rgb),.3)}
+  &.on{background:var(--bd-cta);color:var(--bd-on-brand);border-color:var(--bd-red-deep);box-shadow:0 5px 0 var(--bd-red-deep),var(--bd-shadow-red);transform:translateY(-1px)}
+  &.on::before{opacity:.5}
+  &.on:active,&.on.is-pressed{transform:translateY(4px);box-shadow:0 1px 0 var(--bd-red-deep)}
+}
+
+// ---------- Segmented control (app-seg): a raised navy pill slides under the chosen option
+.dl-seg{
+  position:relative;display:grid;grid-template-columns:repeat(var(--n,2),minmax(0,1fr));padding:5px;border-radius:18px;
+  background:var(--bd-paper);box-shadow:inset 0 2px 4px rgba(var(--bd-navy-rgb),.1),inset 0 0 0 1px rgba(var(--bd-navy-rgb),.05);
+  button{
+    position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:0 6px;border:0;border-radius:14px;
+    background:transparent;color:var(--bd-muted);font:700 .9rem var(--ion-font-family);line-height:1.2;transition:color .25s ease;-webkit-tap-highlight-color:transparent;
+  }
+  button.on{color:var(--bd-on-brand);font-weight:800}
+  button:disabled{opacity:.5}
+}
+.dl-seg-pill{
+  position:absolute;top:5px;bottom:5px;left:5px;width:calc((100% - 10px) / var(--n,2));border-radius:14px;
+  background:var(--bd-navy-btn);box-shadow:0 3px 0 var(--bd-navy-ink),0 10px 18px -8px rgba(var(--bd-navy-rgb),.7),inset 0 1px 0 rgba(var(--bd-on-brand-rgb),.25);
+  transform:translateX(calc(100% * var(--i,0)));transition:transform .4s var(--bd-spring),opacity .2s ease;
+}
+.dl-seg.off .dl-seg-pill{opacity:0}
+.dl-seg-badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--bd-cta);color:var(--bd-on-brand);font-size:.72rem;font-weight:800;box-shadow:0 2px 6px -1px rgba(var(--bd-red-rgb),.6)}
+
+// ---------- Avatars: soft 3D tiles with initials
+.dl-av{
+  position:relative;display:grid;place-items:center;flex:none;width:54px;height:54px;border-radius:18px;
+  background:linear-gradient(160deg,var(--bd-card) 0%,var(--bd-navy-soft) 100%);color:var(--bd-navy);font-weight:800;font-size:1.05rem;
+  box-shadow:inset 0 -3px 0 rgba(var(--bd-navy-rgb),.14),inset 0 1px 0 var(--bd-card),0 6px 14px -8px rgba(var(--bd-navy-rgb),.5);border:1px solid rgba(var(--bd-navy-rgb),.08);
+}
+.dl-bg{
+  position:absolute;right:-9px;bottom:-9px;min-width:32px;padding:3px 7px;border-radius:99px;background:var(--bd-cta);color:var(--bd-on-brand);
+  border:2px solid var(--bd-card);font-size:.72rem;font-weight:800;text-align:center;box-shadow:0 4px 10px -3px rgba(var(--bd-red-rgb),.7)
+}
+.dl-blood{display:inline-grid;place-items:center;min-width:44px;height:30px;padding:0 10px;border-radius:99px;background:var(--bd-red-soft);color:var(--bd-red);font-weight:800;font-size:.88rem;box-shadow:inset 0 0 0 1px rgba(var(--bd-red-rgb),.15)}
 
 // ---------- Forms
-.dl-form{display:grid;gap:14px}
-.dl-form ion-input,.dl-form ion-select{
-  --border-radius:var(--bd-r-sm);--border-color:var(--bd-line);--highlight-color-focused:var(--bd-navy);--background:var(--bd-paper);
+.dl-form{display:grid;gap:16px}
+.dl-form ion-input,.dl-form ion-select,.dl-form ion-textarea,ion-input.dl-field{
+  --border-radius:var(--bd-r-sm);--border-color:var(--bd-line-strong);--highlight-color-focused:var(--bd-navy);--background:var(--bd-card);
   min-height:var(--bd-tap);
 }
-.dl-form ion-input ion-icon[slot=start]{margin-inline-end:8px;color:var(--bd-muted);font-size:1.15rem}
+.dl-form ion-input ion-icon[slot=start]{margin-inline-end:8px;color:var(--bd-navy);opacity:.75;font-size:1.15rem}
 .dl-links{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px;margin-top:10px}
 
 // ---------- Status, messages, pills
 .dl-msg{margin:0;color:var(--bd-muted);line-height:1.5}
 .dl-msg.err{color:var(--bd-red)}
-.dl-alert{display:flex;gap:10px;align-items:flex-start;margin:0;padding:12px 14px;border-radius:var(--bd-r-sm);background:var(--bd-red-soft);color:var(--bd-red);line-height:1.45;font-weight:600}
-.dl-info{display:flex;gap:10px;align-items:flex-start;margin:0;padding:12px 14px;border-radius:var(--bd-r-sm);background:var(--bd-navy-soft);color:var(--bd-navy);line-height:1.45;font-weight:600}
+.dl-alert,.dl-info{display:flex;gap:10px;align-items:flex-start;margin:0;padding:13px 14px;border-radius:var(--bd-r-sm);line-height:1.45;font-weight:600;font-size:.92rem}
+.dl-alert{background:var(--bd-red-soft);color:var(--bd-red);box-shadow:inset 3px 0 0 var(--bd-red)}
+.dl-info{background:var(--bd-navy-soft);color:var(--bd-navy);box-shadow:inset 3px 0 0 var(--bd-navy)}
 .dl-alert ion-icon,.dl-info ion-icon{flex:none;font-size:1.2rem;margin-top:1px}
 .dl-offline{margin:0 16px 12px;position:relative;z-index:3}
 .dl-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:var(--bd-paper);color:var(--bd-muted);font-size:.75rem;font-weight:700}
 .dl-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.7}
 .dl-pill.ok{background:var(--bd-ok-soft);color:var(--bd-ok)}
-.dl-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;background:rgba(var(--bd-on-brand-rgb),.14);color:var(--bd-on-brand);font-size:.8rem;font-weight:700}
-.dl-note{display:flex;gap:8px;margin:20px 16px 0;padding:12px 14px;border-radius:var(--bd-r-sm);background:var(--bd-card);border:1px dashed var(--bd-line);color:var(--bd-muted);font-size:.8rem;line-height:1.5}
+.dl-pill.ok::before{opacity:1;box-shadow:0 0 0 3px rgba(var(--bd-ok-rgb),.2);animation:dl-ping 1.8s ease-out infinite}
+@keyframes dl-ping{0%{box-shadow:0 0 0 0 rgba(var(--bd-ok-rgb),.45)}100%{box-shadow:0 0 0 7px rgba(var(--bd-ok-rgb),0)}}
+.dl-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;background:var(--bd-glass);border:1px solid var(--bd-glass-line);color:var(--bd-on-brand);font-size:.8rem;font-weight:700;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.dl-note{display:flex;gap:10px;margin:22px 16px 0;padding:14px;border-radius:var(--bd-r-sm);background:rgba(var(--bd-on-brand-rgb),.6);border:1px dashed var(--bd-line-strong);color:var(--bd-muted);font-size:.8rem;line-height:1.5}
 .dl-note ion-icon{flex:none;font-size:1rem;margin-top:1px}
+
+// ---------- Empty/first-use state
+.dl-state{display:grid;justify-items:center;gap:6px;text-align:center;padding:16px 24px 8px}
+.dl-state h3{margin:8px 0 0;font-size:1.08rem;font-weight:800}
+.dl-state app-art{width:140px}
+.dl-state ion-button{margin-top:10px}
 
 // ---------- Loading skeleton
 .dl-skel{background:linear-gradient(90deg,var(--bd-line) 0%,var(--bd-paper) 50%,var(--bd-line) 100%);background-size:200% 100%;animation:dl-shimmer 1.2s infinite linear;border-radius:var(--bd-r-sm)}
@@ -86,14 +190,18 @@ ion-button.dl-link{--color:var(--bd-navy);font-weight:700}
 .dl-float{animation:dl-float 4.5s ease-in-out infinite}
 @keyframes dl-float{50%{transform:translateY(-8px)}}
 
-// ---------- Tabs: elevated bar with rounded top
+// ---------- Tabs: floating rounded bar; the selected icon sits in a soft pill
+ion-tabs{background:var(--bd-paper)}
 ion-tab-bar{
   --background:var(--bd-card);--color:var(--bd-muted);--color-selected:var(--bd-navy);--border:0;
-  height:calc(64px + var(--ion-safe-area-bottom,0px));border-radius:22px 22px 0 0;box-shadow:0 -8px 24px -12px rgba(var(--bd-navy-rgb),.25);
+  height:68px;margin:0 12px calc(var(--ion-safe-area-bottom,0px) + 10px);padding:0 6px;border-radius:26px;
+  box-shadow:0 18px 40px -14px rgba(var(--bd-navy-rgb),.45),0 0 0 1px rgba(var(--bd-navy-rgb),.06);overflow:hidden;
 }
-ion-tab-button{font-weight:700;--padding-top:6px}
-ion-tab-button ion-label{font-size:.72rem}
-ion-tab-button.tab-selected ion-icon{transform:translateY(-1px)}
+ion-tab-button{--background:transparent;font-weight:700;--padding-top:8px;--padding-bottom:6px;--ripple-color:var(--bd-navy)}
+ion-tab-button ion-label{font-size:.72rem;margin-top:4px}
+ion-tab-button ion-icon{padding:4px 16px;border-radius:99px;transition:background .25s ease,transform .3s var(--bd-spring)}
+ion-tab-button.tab-selected ion-icon{background:var(--bd-navy-soft);transform:translateY(-1px)}
+ion-tab-button.tab-selected ion-label{font-weight:800}
 
 // ---------- Status bar scrim: keeps scrolled content from showing under the status icons
 .dl-statusbar{position:fixed;inset:0 0 auto;height:var(--ion-safe-area-top,0px);background:var(--bd-navy-deep);z-index:1000;pointer-events:none}
@@ -103,18 +211,24 @@ ion-tab-button.tab-selected ion-icon{transform:translateY(-1px)}
 #dl-boot img{width:min(58vw,260px);height:auto}
 #dl-boot.gone{opacity:0;pointer-events:none}
 
+// ---------- Modals: rounded sheet top
+ion-modal{--border-radius:28px 28px 0 0}
+ion-modal ion-toolbar{--background:var(--bd-card);--border-width:0;padding-top:6px}
+ion-modal ion-title{font-weight:800;letter-spacing:-.02em}
+
 // ---------- Small layout helpers shared by auth screens
 .dl-row-end{display:flex;justify-content:flex-end;margin:-8px 0 -6px}
 .dl-switch{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;margin:18px 16px 0;color:var(--bd-muted);font-size:.92rem}
 .dl-art-sm{width:132px;margin:0 auto 8px}
 .dl-steps{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:10px;counter-reset:s}
 .dl-steps li{display:flex;gap:12px;align-items:center;line-height:1.4;counter-increment:s}
-.dl-steps li::before{content:counter(s);flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--bd-navy-soft);color:var(--bd-navy);font-weight:800;font-size:.85rem}
+.dl-steps li::before{content:counter(s);flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:var(--bd-navy-btn);color:var(--bd-on-brand);font-weight:800;font-size:.85rem;box-shadow:0 3px 0 var(--bd-navy-ink)}
 
 // ---------- "or" divider + guest entry card (login)
 .dl-or{display:flex;align-items:center;gap:12px;margin:22px 32px 14px;color:var(--bd-muted);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
-.dl-or::before,.dl-or::after{content:"";flex:1;height:1px;background:var(--bd-line)}
-.dl-guest{display:flex;align-items:center;gap:14px;width:calc(100% - 32px);margin:0 16px;padding:14px 16px;text-align:left;font-family:var(--ion-font-family);color:var(--bd-ink);box-shadow:0 4px 0 var(--bd-line),var(--bd-shadow-1)}
+.dl-or::before,.dl-or::after{content:"";flex:1;height:1px;background:var(--bd-line-strong)}
+.dl-guest{display:flex;align-items:center;gap:14px;width:calc(100% - 32px);margin:0 16px;padding:16px;text-align:left;font-family:var(--ion-font-family);color:var(--bd-ink);box-shadow:0 5px 0 var(--bd-line-strong),var(--bd-shadow-1)}
+.dl-guest:active,.dl-guest.is-pressed{box-shadow:0 1px 0 var(--bd-line-strong)}
 .dl-guest strong{display:block;font-size:1rem;font-weight:800}.dl-guest small{color:var(--bd-muted);font-size:.85rem}
 .dl-guest > span:nth-child(2){flex:1}
-.dl-guest-ic{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:14px;background:var(--bd-red-soft);color:var(--bd-red);font-size:1.35rem}
+.dl-guest-ic{display:grid;place-items:center;flex:none;width:48px;height:48px;border-radius:16px;background:var(--bd-cta);color:var(--bd-on-brand);font-size:1.35rem;box-shadow:0 3px 0 var(--bd-red-deep),var(--bd-shadow-red)}

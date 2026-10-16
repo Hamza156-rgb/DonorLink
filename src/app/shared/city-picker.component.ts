@@ -10,8 +10,10 @@ import { PressDirective } from './press.directive';
   selector: 'app-city-picker',
   imports: [IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonSearchbar, IonList, IonItemGroup, IonItemDivider, IonItem, IonLabel, IonIcon, PressDirective],
   styles: [`
-    .field{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:8px 14px;border:1px solid var(--bd-line);border-radius:var(--bd-r-sm);
-      background:var(--bd-paper);color:var(--bd-ink);font-family:var(--ion-font-family);text-align:left}
+    .field{display:flex;align-items:center;gap:10px;width:100%;min-height:58px;padding:8px 14px;border:1px solid var(--bd-line-strong);border-radius:16px;
+      background:var(--bd-card);color:var(--bd-ink);font-family:var(--ion-font-family);text-align:left;box-shadow:0 3px 0 var(--bd-line-strong),var(--bd-shadow-1)}
+    .field.is-pressed{transform:translateY(2px);box-shadow:0 1px 0 var(--bd-line-strong)}
+    .field ion-icon:first-child{padding:8px;font-size:1.1rem;border-radius:11px;background:var(--bd-navy-soft);color:var(--bd-navy)}
     .field .txt{flex:1;min-width:0;display:grid}
     .field small{color:var(--bd-muted);font-size:.75rem}
     .field strong{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -19,7 +21,7 @@ import { PressDirective } from './press.directive';
     .chips{display:flex;flex-wrap:wrap;gap:8px;padding:4px 16px 12px}
     .chip{min-height:40px;padding:0 14px;border:1px solid var(--bd-line);border-radius:99px;background:var(--bd-card);color:var(--bd-ink);
       font:700 .9rem var(--ion-font-family);box-shadow:0 2px 0 var(--bd-line)}
-    .chip.on{background:var(--bd-navy);border-color:var(--bd-navy);color:var(--bd-on-brand)}
+    .chip.on{background:var(--bd-navy-btn);border-color:var(--bd-navy-deep);color:var(--bd-on-brand);box-shadow:0 2px 0 var(--bd-navy-ink)}
     .hint{margin:4px 16px 8px;color:var(--bd-muted);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
     ion-item-divider{--background:var(--bd-paper);--color:var(--bd-muted);font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;min-height:36px}
     ion-item{--min-height:52px} ion-item.on{--color:var(--bd-navy);font-weight:800}

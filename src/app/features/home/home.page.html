@@ -2,36 +2,37 @@
   <header class="dl-hero">
     <div class="dl-hero-top">
       <span class="dl-brand"><span class="dl-logo-badge"><img src="assets/brand/logo-mark.png" alt="" width="32" height="31" /></span>DonorLink</span>
-      <a class="avatar" routerLink="/tabs/account" aria-label="Your account">@if (guest()) {<ion-icon name="person" aria-hidden="true" />} @else {{{ initials() }}}</a>
+      <a class="avatar" appPress routerLink="/tabs/account" aria-label="Your account">@if (guest()) {<ion-icon name="person" aria-hidden="true" />} @else {{{ initials() }}}</a>
     </div>
     <p class="hello">{{ greeting }},</p>
     <h1 class="name">{{ firstName() }}</h1>
     <p>Every drop connects a life.</p>
   </header>
 
-  <section class="dl-sheet urgent" aria-labelledby="need-title">
+  <section class="dl-sheet urgent" appTilt aria-labelledby="need-title">
     <div class="urgent-text">
+      <span class="tag"><span class="beat" aria-hidden="true"></span>Urgent help</span>
       <h2 id="need-title">Need blood?</h2>
       <p class="dl-sub">Find volunteer donors by blood group and city.</p>
       <ion-button appPress class="dl-cta" routerLink="/tabs/donors">Find donors <ion-icon slot="end" name="arrow-forward" /></ion-button>
     </div>
-    <app-art class="urgent-art dl-float" kind="search" />
+    <div class="urgent-art"><app-art class="dl-float" kind="search" /></div>
   </section>
 
   @if (!guest() && donor() !== undefined) {
     <section class="dl-section">
       @if (donor(); as d) {
-        <a class="dl-card join me" appPress routerLink="/tabs/account/donor">
+        <a class="dl-card join me" appPress appTilt routerLink="/tabs/account/donor">
           <span class="join-ic red">{{ d.bloodGroup }}</span>
           <div class="join-txt"><h2>{{ d.discoverable ? 'You’re listed as a donor' : 'Your donor profile is hidden' }}</h2>
             <p class="dl-sub">{{ d.city }} · {{ availabilityLabel[d.availability] }}. Tap to update your availability.</p></div>
           <ion-icon class="chev" name="chevron-forward" aria-hidden="true" />
         </a>
       } @else {
-        <article class="dl-card join">
+        <article class="dl-card join" appTilt>
           <span class="join-ic"><ion-icon name="heart" aria-hidden="true" /></span>
           <div class="join-txt"><h2>Become a donor</h2><p class="dl-sub">Add your blood group and city so people nearby can find you.</p></div>
-          <ion-button appPress class="dl-cta" expand="block" routerLink="/tabs/account/donor">Set up donor profile</ion-button>
+          <ion-button appPress class="dl-navy" expand="block" routerLink="/tabs/account/donor">Set up donor profile</ion-button>
         </article>
       }
     </section>
@@ -39,7 +40,7 @@
 
   @if (guest()) {
     <section class="dl-section">
-      <article class="dl-card join">
+      <article class="dl-card join" appTilt>
         <span class="join-ic"><ion-icon name="heart" aria-hidden="true" /></span>
         <div class="join-txt"><h2>You’re browsing as a guest</h2><p class="dl-sub">Create a free account to contact donors, or to list yourself as a donor.</p></div>
         <ion-button appPress fill="outline" color="secondary" expand="block" routerLink="/register">Create free account</ion-button>
@@ -49,7 +50,7 @@
 
   <section class="dl-section" aria-labelledby="groups-title">
     <h2 class="dl-section-title" id="groups-title">Search by blood group</h2>
-    <div class="dl-keys">
+    <div class="dl-keys dl-stagger">
       @for (g of groups; track g) {
         <button class="dl-key" appPress type="button" [routerLink]="['/tabs/donors']" [queryParams]="{ group: g }" [attr.aria-label]="'Find ' + g + ' donors'">{{ g }}</button>
       }
@@ -60,7 +61,8 @@
     <h2 class="dl-section-title" id="how-title">How DonorLink works</h2>
     <div class="steps">
       @for (s of steps; track s.title; let i = $index) {
-        <article class="dl-card step">
+        <article class="dl-card step" appTilt>
+          <span class="step-num" aria-hidden="true">{{ i + 1 }}</span>
           <span class="step-ic"><ion-icon [name]="s.icon" aria-hidden="true" /></span>
           <span class="step-n">Step {{ i + 1 }}</span>
           <h3>{{ s.title }}</h3>
@@ -71,7 +73,7 @@
   </section>
 
   <section class="dl-section">
-    <article class="privacy">
+    <article class="privacy" appTilt>
       <span class="lock"><ion-icon name="lock-closed" aria-hidden="true" /></span>
       <div><h3>Private by design</h3><p>Phone numbers and emails are never shown in search results.</p></div>
     </article>

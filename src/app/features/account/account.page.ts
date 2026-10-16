@@ -13,8 +13,9 @@ import { DonorProfileService } from '../../core/donor-profile.service';
 import { AVAILABILITY_LABEL } from '../../core/models';
 import { environment } from '../../../environments/environment';
 import { PressDirective } from '../../shared/press.directive';
+import { TiltDirective } from '../../shared/tilt.directive';
 
-@Component({ selector:'app-account', imports:[IonContent,IonButton,IonIcon,IonRouterLink,RouterLink,DatePipe,ArtComponent,PressDirective], templateUrl:'./account.page.html', styleUrls:['./account.page.scss'] })
+@Component({ selector:'app-account', imports:[IonContent,IonButton,IonIcon,IonRouterLink,RouterLink,DatePipe,ArtComponent,PressDirective,TiltDirective], templateUrl:'./account.page.html', styleUrls:['./account.page.scss'] })
 export class AccountPage {
   private auth = inject(AuthService); private profiles = inject(ProfileService); private router = inject(Router);
   user = toSignal(this.auth.user$);

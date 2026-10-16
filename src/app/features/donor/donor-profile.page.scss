@@ -1,18 +1,13 @@
-.lbl{margin:0 0 10px;color:var(--bd-muted);font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
-.preview{display:flex;align-items:center;gap:14px;padding:14px;box-shadow:none;background:var(--bd-paper)}
-.av{position:relative;display:grid;place-items:center;flex:none;width:54px;height:54px;border-radius:18px;background:var(--bd-navy-soft);color:var(--bd-navy);font-weight:800;box-shadow:inset 0 -3px 0 rgba(var(--bd-navy-rgb),.12)}
-.bg{position:absolute;right:-8px;bottom:-8px;min-width:30px;padding:3px 6px;border-radius:99px;background:var(--bd-red-soft);color:var(--bd-red);border:2px solid var(--bd-card);font-size:.72rem;font-weight:800;text-align:center}
+.lbl{margin:0 0 10px;color:var(--bd-muted);font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.preview{display:flex;align-items:center;gap:16px;padding:16px;background:radial-gradient(80% 120% at 100% 0%,var(--bd-navy-soft),transparent 70%),var(--bd-card)}
 .info{flex:1;min-width:0;display:grid;gap:3px;justify-items:start}.info strong{font-weight:800}
 .info small{display:flex;align-items:center;gap:4px;color:var(--bd-muted)}
 .hidden-tag{padding:4px 10px;border-radius:99px;background:var(--bd-line);color:var(--bd-muted);font-size:.75rem;font-weight:800}
 .gap{margin-top:16px}
-.form{display:grid;gap:10px}
-.top{margin-top:14px}
-.hint{margin:0;color:var(--bd-muted);font-size:.82rem}
+.form{display:grid;gap:12px}
+.top{margin-top:16px}
+.hint{margin:4px 0 0;color:var(--bd-muted);font-size:.82rem}
 .field-err{margin:0;color:var(--bd-red);font-size:.85rem;font-weight:600}
-ion-segment{--background:var(--bd-card);border-radius:var(--bd-r-sm);box-shadow:var(--bd-shadow-1)}
-ion-segment-button{--indicator-color:var(--bd-navy);--color-checked:var(--bd-on-brand);min-height:48px;font-weight:700;text-transform:none;letter-spacing:0;font-size:.85rem}
-.name{--border-radius:var(--bd-r-sm);--border-color:var(--bd-line);--background:var(--bd-card)}
-.toggle-row{padding:6px 16px;margin-top:6px}.toggle-row ion-toggle{--track-background-checked:var(--bd-navy);min-height:var(--bd-tap);width:100%}
+.toggle-row{padding:8px 16px;margin-top:6px}.toggle-row ion-toggle{--track-background-checked:var(--bd-navy);min-height:var(--bd-tap);width:100%}
 .toggle-row small{color:var(--bd-muted);font-weight:500}
 .remove{--color:var(--bd-red);font-weight:700}

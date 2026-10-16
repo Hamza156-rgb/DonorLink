@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, input, signal, untracked } from '@
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertController, IonButton, IonContent, IonIcon, IonInput, IonSegment, IonSegmentButton, IonSpinner, IonToggle, ToastController } from '@ionic/angular';
+import { AlertController, IonButton, IonContent, IonIcon, IonInput, IonSpinner, IonToggle, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { alertCircle, chevronBack, cloudOfflineOutline, informationCircleOutline, locationOutline, lockClosed, shieldCheckmark } from 'ionicons/icons';
 import { AuthService } from '../../core/auth.service';
@@ -13,8 +13,10 @@ import { NetworkService } from '../../core/network.service';
 import { OnboardingService } from '../../core/onboarding.service';
 import { CityPickerComponent } from '../../shared/city-picker.component';
 import { PressDirective } from '../../shared/press.directive';
+import { SegComponent, SegOption } from '../../shared/seg.component';
+import { TiltDirective } from '../../shared/tilt.directive';
 
-@Component({ selector:'app-donor-profile', imports:[IonContent,IonButton,IonIcon,IonInput,IonSegment,IonSegmentButton,IonSpinner,IonToggle,FormsModule,CityPickerComponent,PressDirective], templateUrl:'./donor-profile.page.html', styleUrls:['./donor-profile.page.scss'] })
+@Component({ selector:'app-donor-profile', imports:[IonContent,IonButton,IonIcon,IonInput,IonSpinner,SegComponent,TiltDirective,IonToggle,FormsModule,CityPickerComponent,PressDirective], templateUrl:'./donor-profile.page.html', styleUrls:['./donor-profile.page.scss'] })
 export class DonorProfilePage {
   private auth = inject(AuthService); private donors = inject(DonorProfileService); private onboarding = inject(OnboardingService);
   private router = inject(Router); private toast = inject(ToastController); private alert = inject(AlertController);
@@ -24,6 +26,7 @@ export class DonorProfilePage {
   private user = toSignal(this.auth.user$);
   mine = toSignal(this.donors.mine$);           // undefined = loading
   groups = BLOOD_GROUPS; availabilities = AVAILABILITY; availabilityLabel = AVAILABILITY_LABEL;
+  availabilityOptions: SegOption[] = AVAILABILITY.map(a => ({ value: a, label: AVAILABILITY_LABEL[a] }));
 
   displayName = ''; bloodGroup = signal<BloodGroup | null>(null); city = ''; availability: Availability = 'available'; discoverable = true;
   busy = signal(false); error = signal(''); touched = signal(false);

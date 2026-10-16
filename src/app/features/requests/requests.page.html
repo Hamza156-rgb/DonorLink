@@ -14,28 +14,25 @@
     </section>
   } @else {
     <section class="dl-sheet seg">
-      <ion-segment [value]="tab()" (ionChange)="setView($event)">
-        <ion-segment-button value="received">Received @if (pending()) {<span class="count">{{ pending() }}</span>}</ion-segment-button>
-        <ion-segment-button value="sent">Sent</ion-segment-button>
-      </ion-segment>
+      <app-seg [options]="views()" [value]="tab()" (valueChange)="setView($event)" aria-label="Show requests" />
     </section>
 
     @if (!contactOn) { <p class="dl-info dl-offline gap" role="status"><ion-icon name="information-circle-outline" />Contact requests are coming soon. You can already search donors.</p> }
     @if (!net.online()) { <p class="dl-info dl-offline gap"><ion-icon name="information-circle-outline" />You’re offline. Showing your last saved requests.</p> }
     @if (loadError()) { <p class="dl-alert dl-offline gap" role="alert">Couldn’t load requests. Pull down or reopen this tab to try again.</p> }
 
-    <section class="list" aria-live="polite">
+    <section class="list dl-stagger" aria-live="polite">
       @if (tab() === 'received') {
         @if (received() === undefined) { @for (i of [1,2]; track i) { <div class="dl-card sk"><div class="dl-skel"></div><div class="dl-skel"></div><div class="dl-skel"></div></div> } }
         @else if (!received()?.length) {
-          <div class="state"><app-art class="state-art" kind="care" /><h3>No requests yet</h3><p class="dl-sub">When someone needs your blood group, their request will appear here. You decide whether to share your number.</p></div>
+          <div class="dl-state"><app-art kind="care" /><h3>No requests yet</h3><p class="dl-sub">When someone needs your blood group, their request will appear here. You decide whether to share your number.</p></div>
         }
         @for (r of received() ?? []; track r.id) {
-          <article class="dl-card req" [class.pending]="r.status === 'pending'">
+          <article class="dl-card req" appTilt [class.pending]="r.status === 'pending'" [attr.data-status]="r.status">
             <div class="top">
-              <div class="av">{{ initials(r.fromName) }}</div>
+              <div class="dl-av">{{ initials(r.fromName) }}</div>
               <div class="who"><strong>{{ r.fromName }}</strong><small>{{ ago(r) }}</small></div>
-              <span class="need">{{ r.bloodGroup }}</span>
+              <span class="dl-blood">{{ r.bloodGroup }}</span>
             </div>
             <p class="meta"><ion-icon name="medkit-outline" aria-hidden="true" />{{ r.hospital }}</p>
             <p class="meta"><ion-icon name="time-outline" aria-hidden="true" />{{ urgencyLabel[r.urgency] }}</p>
@@ -57,15 +54,15 @@
       } @else {
         @if (sent() === undefined) { @for (i of [1,2]; track i) { <div class="dl-card sk"><div class="dl-skel"></div><div class="dl-skel"></div><div class="dl-skel"></div></div> } }
         @else if (!sent()?.length) {
-          <div class="state"><app-art class="state-art" kind="search" /><h3>You haven’t contacted anyone yet</h3><p class="dl-sub">Find a donor and tap Contact. Their reply will show here.</p>
+          <div class="dl-state"><app-art kind="search" /><h3>You haven’t contacted anyone yet</h3><p class="dl-sub">Find a donor and tap Contact. Their reply will show here.</p>
             <ion-button appPress class="dl-cta" routerLink="/tabs/donors">Find donors</ion-button></div>
         }
         @for (r of sent() ?? []; track r.id) {
-          <article class="dl-card req">
+          <article class="dl-card req" appTilt [attr.data-status]="r.status">
             <div class="top">
-              <div class="av">{{ initials(r.toName) }}</div>
+              <div class="dl-av">{{ initials(r.toName) }}</div>
               <div class="who"><strong>{{ r.toName }}</strong><small><ion-icon name="location-outline" aria-hidden="true" />{{ r.city }} · {{ ago(r) }}</small></div>
-              <span class="need">{{ r.bloodGroup }}</span>
+              <span class="dl-blood">{{ r.bloodGroup }}</span>
             </div>
             <p class="meta"><ion-icon name="medkit-outline" aria-hidden="true" />{{ r.hospital }}</p>
             @switch (r.status) {

@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { AlertController, IonButton, IonContent, IonIcon, IonRouterLink, IonSegment, IonSegmentButton, IonSpinner, ToastController } from '@ionic/angular';
+import { AlertController, IonButton, IonContent, IonIcon, IonRouterLink, IonSpinner, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { call, checkmarkCircle, closeCircle, informationCircleOutline, locationOutline, logoWhatsapp, medkitOutline, timeOutline } from 'ionicons/icons';
 import { catchError, of } from 'rxjs';
@@ -12,11 +12,13 @@ import { ContactRequest, URGENCY_LABEL } from '../../core/models';
 import { NetworkService } from '../../core/network.service';
 import { ArtComponent } from '../../shared/art.component';
 import { PressDirective } from '../../shared/press.directive';
+import { SegComponent, SegOption } from '../../shared/seg.component';
+import { TiltDirective } from '../../shared/tilt.directive';
 import { environment } from '../../../environments/environment';
 
 type View = 'received' | 'sent';
 
-@Component({ selector:'app-requests', imports:[IonContent,IonSegment,IonSegmentButton,IonButton,IonIcon,IonSpinner,IonRouterLink,RouterLink,ArtComponent,PressDirective], templateUrl:'./requests.page.html', styleUrls:['./requests.page.scss'] })
+@Component({ selector:'app-requests', imports:[IonContent,SegComponent,TiltDirective,IonButton,IonIcon,IonSpinner,IonRouterLink,RouterLink,ArtComponent,PressDirective], templateUrl:'./requests.page.html', styleUrls:['./requests.page.scss'] })
 export class RequestsPage {
   private contacts = inject(ContactService); private alert = inject(AlertController); private toast = inject(ToastController);
   readonly net = inject(NetworkService);
@@ -30,6 +32,7 @@ export class RequestsPage {
   received = toSignal(this.orError(this.contacts.received$));
   sent = toSignal(this.orError(this.contacts.sent$));
   pending = computed(() => (this.received() ?? []).filter(r => r.status === 'pending').length);
+  views = computed<SegOption[]>(() => [{ value: 'received', label: 'Received', badge: this.pending() }, { value: 'sent', label: 'Sent' }]);
   busyId = signal(''); contactOn = environment.features.contact;
   urgencyLabel = URGENCY_LABEL; ago = (r: ContactRequest) => timeAgo(r.createdAt?.toDate()); phone = displayPhone;
 
@@ -37,7 +40,7 @@ export class RequestsPage {
     addIcons({ call, checkmarkCircle, closeCircle, informationCircleOutline, locationOutline, logoWhatsapp, medkitOutline, timeOutline });
     effect(() => { const v = this.view(); if (v === 'sent' || v === 'received') this.tab.set(v); });
   }
-  setView(e: Event) { this.tab.set((e as CustomEvent).detail.value as View); }
+  setView(v: string) { this.tab.set(v as View); }
   initials(name: string) { return name.trim().split(/\s+/).slice(0, 2).map(w => w[0]?.toUpperCase()).join(''); }
   wa(r: ContactRequest) { return whatsappLink(r.sharedContact!.phone, `Assalam-o-Alaikum ${r.sharedContact!.name.split(' ')[0]}, I contacted you on DonorLink about ${r.bloodGroup} blood for a patient at ${r.hospital}.`); }
 

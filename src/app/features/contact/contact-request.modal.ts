@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonSpinner, IonTextarea, IonTitle, IonToolbar, ModalController } from '@ionic/angular';
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonSelect, IonSelectOption, IonSpinner, IonTextarea, IonTitle, IonToolbar, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { alertCircle, close, informationCircleOutline, locationOutline, lockClosed, medkitOutline } from 'ionicons/icons';
 import { authErrorMessage } from '../../core/auth-errors';
@@ -10,11 +10,13 @@ import { BLOOD_GROUPS, BloodGroup, PublicDonor, URGENCY, URGENCY_LABEL, Urgency 
 import { NetworkService } from '../../core/network.service';
 import { ArtComponent } from '../../shared/art.component';
 import { PressDirective } from '../../shared/press.directive';
+import { SegComponent, SegOption } from '../../shared/seg.component';
+import { TiltDirective } from '../../shared/tilt.directive';
 
 /** Bottom sheet: seeker asks a donor to share their contact details. */
 @Component({
   selector: 'app-contact-request',
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonIcon, IonInput, IonTextarea, IonSelect, IonSelectOption, IonSegment, IonSegmentButton, IonSpinner, ReactiveFormsModule, ArtComponent, PressDirective],
+  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonIcon, IonInput, IonTextarea, IonSelect, IonSelectOption, IonSpinner, ReactiveFormsModule, SegComponent, TiltDirective, ArtComponent, PressDirective],
   templateUrl: './contact-request.modal.html',
   styleUrls: ['./contact-request.modal.scss'],
 })
@@ -26,6 +28,7 @@ export class ContactRequestComponent implements OnInit {
   donor!: PublicDonor;
   neededGroup: BloodGroup | null = null;
   groups = BLOOD_GROUPS; urgencies = URGENCY; urgencyLabel = URGENCY_LABEL;
+  urgencyOptions: SegOption[] = URGENCY.map(u => ({ value: u, label: URGENCY_LABEL[u] }));
   form = inject(FormBuilder).nonNullable.group({
     bloodGroup: ['O+' as BloodGroup, Validators.required],
     urgency: ['today' as Urgency, Validators.required],
